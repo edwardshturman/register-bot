@@ -1,0 +1,49 @@
+{
+  "name": "register-bot",
+  "author": "Edward Shturman",
+  "bugs": "https://github.com/edwardshturman/register-bot/issues",
+  "homepage": "https://github.com/edwardshturman/register-bot",
+  "version": "1.0.0",
+  "license": "UNLICENSED",
+  "description": "Bot for Costco",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/edwardshturman/register-bot.git"
+  },
+  "main": "index.js",
+  "private": true,
+  "scripts": {
+    "test": "standardx --env mocha",
+    "start": "node ."
+  },
+  "eslintConfig": {
+    "rules": {
+      "indent": [
+        "error",
+        4
+      ],
+      "semi": [
+        "error",
+        "always"
+      ]
+    }
+  },
+  "standardx": {
+    "ignore": [
+      "test.js"
+    ]
+  },
+  "dependencies": {
+    "discord.js": "^12.2.0",
+    "dotenv": "^8.2.0",
+    "ffmpeg-static": "^4.2.6",
+    "opusscript": "0.0.7",
+    "request": "2.88.2",
+    "simple-youtube-api": "^5.2.1",
+    "ytdl-core": "^3.2.1"
+  },
+  "devDependencies": {
+    "mocha": "^8.2.1",
+    "standardx": "^7.0.0"
+  }
+}
