@@ -25,7 +25,9 @@ module.exports = {
                             tripDate: args[2],
                             tripEmoji: args[3]
                         }).save().then((newTrip) => {
-                            message.channel.send('New trip: ' + newTrip);
+                            message.channel.send('New trip: ' + newTrip).then((newTripMsg) => {
+                                newTripMsg.react(newTrip.tripEmoji);
+                            });
                         });
                     }
                 }
