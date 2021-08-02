@@ -3,8 +3,8 @@ const Schema = mongoose.Schema;
 
 const tripSchema = new Schema({
     tripName: String,
-    tripId: String,
-    tripDate: String
+    tripDate: String,
+    tripEmoji: String
 });
 
 const Trip = mongoose.model('trip', tripSchema);
