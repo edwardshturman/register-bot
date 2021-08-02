@@ -2,6 +2,13 @@
 const Discord = require('discord.js');
 require('dotenv').config();
 const fs = require('fs');
+const mongoose = require('mongoose');
+const Trip = require('./config/trip-schema');
+
+// Connect to MongoDB
+mongoose.connect(process.env.DBCONNECTION, () => {
+    console.log('Register connected to MongoDB!');
+});
 
 // Launch instance of Discord
 const client = new Discord.Client({ partials: ['MESSAGE', 'GUILD_MEMBER', 'REACTION', 'USER'] });
@@ -19,28 +26,24 @@ for (const file of commandFiles) {
     client.commands.set(command.name, command);
 }
 
-// Announce on launch
+// Log launch, set status
 client.once('ready', () => {
     console.log('Register is online!');
     client.user.setActivity('Edward go on his OCD spiral', { type: 'WATCHING' }).catch(console.error);
 });
 
-// Check to make sure a message starts with the d! prefix, and that it's not sent by a bot
+// Check to make sure a message starts with the r. prefix, and that it's not sent by a bot
 client.on('message', async message => {
     if (!message.content.startsWith(prefix) || message.author.bot || message.author.id !== '373272898368176129') return; // Note: added check, return if not sent by me -Edward
 
-    // identify arguments by a space in the command and properly format
+    // Identify arguments by a space in the command and properly format
     const args = message.content.slice(prefix.length).split(/ +/);
     const command = args.shift().toLowerCase();
 
     if (command === 'ping') {
         client.commands.get('ping').execute(message, args);
-    } else if (command === 'help') {
-        client.commands.get('help').execute(message, args);
-    } else if (command === 'list') {
-        client.commands.get('list').execute(message, args);
-    } else if (command === 'suggest') {
-        client.commands.get('suggest').execute(message, args);
+    } else if (command === 'trip') {
+        client.commands.get('trip').execute(message, args);
     }
 
 }).on('error', () => {

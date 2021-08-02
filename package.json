@@ -5,7 +5,7 @@
   "homepage": "https://github.com/edwardshturman/register-bot",
   "version": "1.0.0",
   "license": "UNLICENSED",
-  "description": "Bot for Costco",
+  "description": "Costco #trip-planning bot",
   "repository": {
     "type": "git",
     "url": "https://github.com/edwardshturman/register-bot.git"
@@ -37,6 +37,7 @@
     "discord.js": "^12.2.0",
     "dotenv": "^8.2.0",
     "ffmpeg-static": "^4.2.6",
+    "mongoose": "^5.13.5",
     "opusscript": "0.0.7",
     "request": "2.88.2",
     "simple-youtube-api": "^5.2.1",
