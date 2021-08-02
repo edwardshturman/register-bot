@@ -11,12 +11,25 @@ module.exports = {
 
         if (args[0] === 'add') {
 
-            new Trip ({
-                tripName: args[1],
-                tripDate: args[2]
-            }).save().then((newTrip) => {
-                message.channel.send('New trip: ' + newTrip);
-            });
+            if (!args[1]) {
+                message.channel.send('You need to include a name, date, and unique emoji!');
+            } else if (args[1]) {
+                if (!args[2]) {
+                    message.channel.send('You need to include a name, date, and unique emoji!');
+                } else if (args[2]) {
+                    if (!args[3]) {
+                        message.channel.send('You need to include a name, date, and unique emoji!');
+                    } else if (args[3]) {
+                        new Trip ({
+                            tripName: args[1],
+                            tripDate: args[2],
+                            tripEmoji: args[3]
+                        }).save().then((newTrip) => {
+                            message.channel.send('New trip: ' + newTrip);
+                        });
+                    }
+                }
+            }
 
         } else if (!args[0]) {
             const tripCommandEmbed = new Discord.MessageEmbed()
