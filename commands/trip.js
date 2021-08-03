@@ -8,6 +8,9 @@ module.exports = {
         const mongoose = require('mongoose');
         const Trip = require('../config/trip-schema');
 
+        global.fetch = require('node-fetch');
+        const unsplash = require('unsplash-js').createApi({ accessKey: process.env.UNSPLASH_ACCESS_KEY });
+
 
         if (args[0] === 'add') {
 
@@ -21,15 +24,39 @@ module.exports = {
                         message.channel.send('You need to include a name, date, and unique emoji!');
                     } else if (args[3]) {
                         if (args[4]) {
-                            new Trip ({
-                                tripName: args[1],
-                                tripDate: args[2],
-                                tripEmoji: args[3],
-                                tripPlanningLink: args[4]
-                            }).save().then((newTrip) => {
-                                message.channel.send('New trip: ' + newTrip).then((newTripMsg) => {
-                                    newTripMsg.react(newTrip.tripEmoji);
-                                });
+                            unsplash.search.getPhotos({
+                                query: args[1],
+                                page: 1,
+                                perPage: 10,
+                                orderBy: 'relevant'
+                            }).then(result => {
+                                if (result.errors) {
+                                    message.channel.send('Encountered an error fetching a thumbnail (check bot console)! To avoid confusion, trip was not created in database.');
+                                    console.log(result.errors[0]);
+                                } else {
+                                    new Trip ({
+                                        tripName: args[1],
+                                        tripDate: args[2],
+                                        tripEmoji: args[3],
+                                        tripPlanningLink: args[4]
+                                    }).save().then((newTrip) => {
+
+                                        const feed = result.response;
+                                        const { results } = feed;
+                                        const newTripEmbed = new Discord.MessageEmbed()
+                                            .setColor('#ff0cff')
+                                            .setTitle('New Costco trip')
+                                            .setDescription('React to this message to be given the associated role!')
+                                            .setThumbnail(results[0].urls.small)
+                                            .addField('Where:', args[1], false)
+                                            .addField('When:', args[2], false)
+                                            .addField('Trip planning page:', args[4], false)
+                                            .setFooter('Image by ' + results[0].user.name + ' on Unsplash');
+                                        message.channel.send(newTripEmbed).then((newTripMsg) => {
+                                            newTripMsg.react(newTrip.tripEmoji);
+                                        });
+                                    });
+                                }
                             });
                         } else if (!args[4]) { // If no trip planning link
                             new Trip ({
