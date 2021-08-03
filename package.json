@@ -39,7 +39,7 @@
     "mongoose": "^5.13.5",
     "node-fetch": "^2.6.1",
     "request": "2.88.2",
-    "unsplash-js": "^7.0.15",
+    "unsplash-js": "^7.0.15"
   },
   "devDependencies": {
     "mocha": "^8.2.1",
