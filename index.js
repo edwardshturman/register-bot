@@ -45,7 +45,6 @@ client.on('message', async message => {
     } else if (command === 'trip') {
         client.commands.get('trip').execute(message, args);
     }
-
 }).on('error', () => {
     console.log(error);
 });
@@ -66,7 +65,6 @@ client.on('ready', () => {
 
 // Listen for reactions to both of Kieran's messages
 client.on('messageReactionAdd', async (reaction, user) => {
-
     const message = reaction.message;
     const emoji = reaction.emoji;
 
@@ -85,7 +83,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 member.roles.add('856077139824345109'); // trip_monterey role
                 console.log('Gave trip_monterey role.');
             });
-
         } else if (emoji.name === '🌉') {
             message.guild.members.fetch(user.id).then(member => {
                 member.roles.add('856077301561032715'); // trip_sausalito role
@@ -98,13 +95,11 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 member.roles.add('856078458769244170'); // trip_fishing role
                 console.log('Gave trip_fishing role.');
             });
-
         } else if (emoji.name === '🔫') {
             message.guild.members.fetch(user.id).then(member => {
                 member.roles.add('856078460572532776'); // trip_airsoft role
                 console.log('Gave trip_airsoft role.');
             });
-
         } else if (emoji.name === '🎥') {
             message.guild.members.fetch(user.id).then(member => {
                 member.roles.add('856078522694631424'); // trip_movie role
@@ -116,7 +111,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
 
 // Listen for reaction removals
 client.on('messageReactionRemove', async (reaction, user) => {
-
     const message = reaction.message;
     const emoji = reaction.emoji;
 
@@ -135,7 +129,6 @@ client.on('messageReactionRemove', async (reaction, user) => {
                 member.roles.remove('856077139824345109'); // trip_monterey role
                 console.log('Removed trip_monterey role.');
             });
-
         } else if (emoji.name === '🌉') {
             message.guild.members.fetch(user.id).then(member => {
                 member.roles.remove('856077301561032715'); // trip_sausalito role
@@ -148,13 +141,11 @@ client.on('messageReactionRemove', async (reaction, user) => {
                 member.roles.remove('856078458769244170'); // trip_fishing role
                 console.log('Removed trip_fishing role.');
             });
-
         } else if (emoji.name === '🔫') {
             message.guild.members.fetch(user.id).then(member => {
                 member.roles.remove('856078460572532776'); // trip_airsoft role
                 console.log('Removed trip_airsoft role.');
             });
-
         } else if (emoji.name === '🎥') {
             message.guild.members.fetch(user.id).then(member => {
                 member.roles.remove('856078522694631424'); // trip_movie role
