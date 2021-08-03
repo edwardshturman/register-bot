@@ -34,27 +34,27 @@ module.exports = {
                                     message.channel.send('Encountered an error fetching a thumbnail (check bot console)! To avoid confusion, trip was not created in database.');
                                     console.log(result.errors[0]);
                                 } else {
-                                    new Trip({
-                                        tripName: args[1],
-                                        tripDate: args[2],
-                                        tripEmoji: args[3],
-                                        tripPlanningLink: args[4]
-                                    }).save().then((newTrip) => {
-
-                                        const feed = result.response;
-                                        const { results } = feed;
-                                        const newTripEmbed = new Discord.MessageEmbed()
-                                            .setColor('#ff0cff')
-                                            .setTitle('New Costco trip')
-                                            .setDescription('React to this message to be given the associated role!')
-                                            .setThumbnail(results[0].urls.regular)
-                                            .addField('Where:', args[1], false)
-                                            .addField('When:', args[2], false)
-                                            .addField('Trip planning page:', args[4], false)
-                                            .setFooter('Image by ' + results[0].user.name + ' on Unsplash');
-                                        message.channel.send(newTripEmbed).then((newTripMsg) => {
-                                            newTripMsg.react(newTrip.tripEmoji);
-                                        });
+                                    const feed = result.response;
+                                    const { results } = feed;
+                                    const newTripEmbed = new Discord.MessageEmbed()
+                                        .setColor('#ff0cff')
+                                        .setTitle('New Costco trip')
+                                        .setDescription('React to this message to be given the associated role!')
+                                        .setThumbnail(results[0].urls.regular)
+                                        .addField('Where:', args[1], false)
+                                        .addField('When:', args[2], false)
+                                        .addField('Trip planning page:', args[4], false)
+                                        .setFooter('Image by ' + results[0].user.name + ' on Unsplash');
+                                    message.channel.send(newTripEmbed).then((newTripMsg) => {
+                                            new Trip({
+                                                tripName: args[1],
+                                                tripDate: args[2],
+                                                tripEmoji: args[3],
+                                                tripPlanningLink: args[4],
+                                                tripMessageId: newTripMsg.id
+                                            }).save().then((newTrip) => {
+                                                newTripMsg.react(newTrip.tripEmoji);
+                                            });
                                     });
                                 }
                             });
@@ -69,23 +69,23 @@ module.exports = {
                                     message.channel.send('Encountered an error fetching a thumbnail (check bot console)! To avoid confusion, trip was not created in database.');
                                     console.log(result.errors[0]);
                                 } else {
-                                    new Trip({
-                                        tripName: args[1],
-                                        tripDate: args[2],
-                                        tripEmoji: args[3]
-                                    }).save().then((newTrip) => {
-
-                                        const feed = result.response;
-                                        const { results } = feed;
-                                        const newTripEmbed = new Discord.MessageEmbed()
-                                            .setColor('#ff0cff')
-                                            .setTitle('New Costco trip')
-                                            .setDescription('React to this message to be given the associated role!')
-                                            .setThumbnail(results[0].urls.regular)
-                                            .addField('Where:', args[1], false)
-                                            .addField('When:', args[2], false)
-                                            .setFooter('Image by ' + results[0].user.name + ' on Unsplash');
-                                        message.channel.send(newTripEmbed).then((newTripMsg) => {
+                                    const feed = result.response;
+                                    const { results } = feed;
+                                    const newTripEmbed = new Discord.MessageEmbed()
+                                        .setColor('#ff0cff')
+                                        .setTitle('New Costco trip')
+                                        .setDescription('React to this message to be given the associated role!')
+                                        .setThumbnail(results[0].urls.regular)
+                                        .addField('Where:', args[1], false)
+                                        .addField('When:', args[2], false)
+                                        .setFooter('Image by ' + results[0].user.name + ' on Unsplash');
+                                    message.channel.send(newTripEmbed).then((newTripMsg) => {
+                                        new Trip({
+                                            tripName: args[1],
+                                            tripDate: args[2],
+                                            tripEmoji: args[3],
+                                            tripMessageId: newTripMsg.id
+                                        }).save().then((newTrip) => {
                                             newTripMsg.react(newTrip.tripEmoji);
                                         });
                                     });
