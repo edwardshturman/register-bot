@@ -92,9 +92,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
                 console.log('Gave trip_sausalito role.');
             });
         }
-    }
-
-    else if (message.id === '856056355005792296') {
+    } else if (message.id === '856056355005792296') {
         if (emoji.name === '🎣') {
             message.guild.members.fetch(user.id).then(member => {
                 member.roles.add('856078458769244170'); // trip_fishing role
@@ -144,9 +142,7 @@ client.on('messageReactionRemove', async (reaction, user) => {
                 console.log('Removed trip_sausalito role.');
             });
         }
-    }
-
-    else if (message.id === '856056355005792296') {
+    } else if (message.id === '856056355005792296') {
         if (emoji.name === '🎣') {
             message.guild.members.fetch(user.id).then(member => {
                 member.roles.remove('856078458769244170'); // trip_fishing role

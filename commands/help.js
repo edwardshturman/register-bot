@@ -9,7 +9,7 @@ module.exports = {
             .setTitle('d.tech Discord bots')
             // .setURL('https://community.dcraft.net/bots')
             .setThumbnail('https://dcraft.net/wp-content/uploads/2020/09/d.srupt-v3.png')
-            .addField('Hey there!', 'As you may have noticed, we\'ve got a lot of bots here, all with their own commands and help pages:', false)
+            .addField('Hey there!', 'As you may have noticed, we\'ve got a lot of bots here, all with their own commands and help pages:', false);
             // .addField('d.ping', 'does what you think it does', false)
             // .addField('d.yt', 'sends a link to the glorious d.craft YouTube', false)
             // .addField('d.verify', 'super high level tactic, remember it, yeah?', false) // testing, use role check from command and remove in production
@@ -24,7 +24,7 @@ module.exports = {
         const helpEmbedTwo = new Discord.MessageEmbed()
             .setColor('#ff3300')
             .setThumbnail('https://dcraft.net/wp-content/uploads/2020/09/d-scord-draft-copy.png')
-            .addField('d.scord', 'd.verify on steroids. jk, it\'s just the d.verify bot. Helps keep things safe', false)
+            .addField('d.scord', 'd.verify on steroids. jk, it\'s just the d.verify bot. Helps keep things safe', false);
         message.channel.send(helpEmbedTwo);
 
         const helpEmbedThree = new Discord.MessageEmbed()

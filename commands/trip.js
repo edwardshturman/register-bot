@@ -34,7 +34,7 @@ module.exports = {
                                     message.channel.send('Encountered an error fetching a thumbnail (check bot console)! To avoid confusion, trip was not created in database.');
                                     console.log(result.errors[0]);
                                 } else {
-                                    new Trip ({
+                                    new Trip({
                                         tripName: args[1],
                                         tripDate: args[2],
                                         tripEmoji: args[3],
@@ -69,7 +69,7 @@ module.exports = {
                                     message.channel.send('Encountered an error fetching a thumbnail (check bot console)! To avoid confusion, trip was not created in database.');
                                     console.log(result.errors[0]);
                                 } else {
-                                    new Trip ({
+                                    new Trip({
                                         tripName: args[1],
                                         tripDate: args[2],
                                         tripEmoji: args[3]
