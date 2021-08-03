@@ -36,12 +36,10 @@
   "dependencies": {
     "discord.js": "^12.2.0",
     "dotenv": "^8.2.0",
-    "ffmpeg-static": "^4.2.6",
     "mongoose": "^5.13.5",
-    "opusscript": "0.0.7",
+    "node-fetch": "^2.6.1",
     "request": "2.88.2",
-    "simple-youtube-api": "^5.2.1",
-    "ytdl-core": "^3.2.1"
+    "unsplash-js": "^7.0.15",
   },
   "devDependencies": {
     "mocha": "^8.2.1",
