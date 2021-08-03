@@ -52,6 +52,7 @@ module.exports = {
                                         }).save().then((newTrip) => {
                                             newTripMsg.react(newTrip.tripEmoji);
                                         });
+                                        message.guild.roles.create({ data: {name: '[Trip] ' + args[1] + ' ' + args[3] } });
                                     });
                                 }
                             });
@@ -85,6 +86,7 @@ module.exports = {
                                         }).save().then((newTrip) => {
                                             newTripMsg.react(newTrip.tripEmoji);
                                         });
+                                        message.guild.roles.create({ data: {name: '[Trip] ' + args[1] + ' ' + args[3] } });
                                     });
                                 }
                             });
