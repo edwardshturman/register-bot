@@ -11,7 +11,11 @@ mongoose.connect(process.env.DBCONNECTION, () => {
 });
 
 // Launch instance of Discord
-const client = new Discord.Client({ partials: ['MESSAGE', 'GUILD_MEMBER', 'REACTION', 'USER'] });
+const { Client, Intents } = require('discord.js');
+const client = new Discord.Client({
+    intents: [Intents.FLAGS.GUIDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS],
+    partials: ['MESSAGE', 'GUILD_MEMBER', 'REACTION', 'USER']
+});
 
 // Prefix
 const prefix = 'r.';
@@ -50,6 +54,55 @@ client.on('message', async message => {
 });
 
 // ****************************** REACTION LISTENERS ******************************
+
+client.on('messageReactionAdd', async (reaction, user) => {
+    // When a reaction is received, check if the structure is partial
+    if (reaction.partial) {
+        // If the message this reaction belongs to was removed, the fetching might result in an API error which should be handled
+        try {
+            await reaction.fetch();
+        } catch (error) {
+            console.error('Something went wrong when fetching the message:', error);
+            // Return as `reaction.message.author` may be undefined/null
+            return;
+        }
+    }
+
+    Trip.findOne({tripMessageId: reaction.message.id}).then((currentTrip) => {
+        if (reaction.emoji.name === currentTrip.tripEmoji) {
+            reaction.message.guild.members.fetch(user.id).then(member => {
+                member.roles.add(currentTrip.tripRoleId);
+            });
+        }
+    })
+});
+
+
+
+client.on('messageReactionRemove', async (reaction, user) => {
+    // When a reaction is received, check if the structure is partial
+    if (reaction.partial) {
+        // If the message this reaction belongs to was removed, the fetching might result in an API error which should be handled
+        try {
+            await reaction.fetch();
+        } catch (error) {
+            console.error('Something went wrong when fetching the message:', error);
+            // Return as `reaction.message.author` may be undefined/null
+            return;
+        }
+    }
+
+    Trip.findOne({tripMessageId: reaction.message.id}).then((currentTrip) => {
+        if (reaction.emoji.name === currentTrip.tripEmoji) {
+            reaction.message.guild.members.fetch(user.id).then(member => {
+                member.roles.remove(currentTrip.tripRoleId);
+            });
+        }
+    })
+});
+
+
+/*
 
 // Kieran #trip-planning messages
 
@@ -154,6 +207,7 @@ client.on('messageReactionRemove', async (reaction, user) => {
         }
     }
 });
+*/
 
 // Login to the bot
 client.login(process.env.TOKEN);

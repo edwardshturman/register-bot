@@ -20,7 +20,7 @@ module.exports = {
                     if (!args[3]) { // If no trip emoji
                         message.channel.send('You need to include a name, date, and unique emoji!');
                     } else if (args[3]) {
-                        if (args[4]) {
+                        if (args[4]) { // Trip planning link included
                             unsplash.search.getPhotos({
                                 query: args[1],
                                 page: 1,
@@ -43,16 +43,18 @@ module.exports = {
                                         .addField('Trip planning page:', args[4], false)
                                         .setFooter('Image by ' + results[0].user.name + ' on Unsplash');
                                     message.channel.send(newTripEmbed).then((newTripMsg) => {
-                                        new Trip({
-                                            tripName: args[1],
-                                            tripDate: args[2],
-                                            tripEmoji: args[3],
-                                            tripPlanningLink: args[4],
-                                            tripMessageId: newTripMsg.id
-                                        }).save().then((newTrip) => {
-                                            newTripMsg.react(newTrip.tripEmoji);
+                                        message.guild.roles.create({ data: {name: '[Trip] ' + args[1] + ' ' + args[3] } }).then((newTripRole) => {
+                                            new Trip({
+                                                tripName: args[1],
+                                                tripDate: args[2],
+                                                tripEmoji: args[3],
+                                                tripMessageId: newTripMsg.id,
+                                                tripRoleId: newTripRole.id,
+                                                tripPlanningLink: args[4],
+                                            }).save().then((newTrip) => {
+                                                newTripMsg.react(newTrip.tripEmoji);
+                                            });
                                         });
-                                        message.guild.roles.create({ data: {name: '[Trip] ' + args[1] + ' ' + args[3] } });
                                     });
                                 }
                             });
@@ -78,15 +80,17 @@ module.exports = {
                                         .addField('When:', args[2], false)
                                         .setFooter('Image by ' + results[0].user.name + ' on Unsplash');
                                     message.channel.send(newTripEmbed).then((newTripMsg) => {
-                                        new Trip({
-                                            tripName: args[1],
-                                            tripDate: args[2],
-                                            tripEmoji: args[3],
-                                            tripMessageId: newTripMsg.id
-                                        }).save().then((newTrip) => {
-                                            newTripMsg.react(newTrip.tripEmoji);
+                                        message.guild.roles.create({ data: {name: '[Trip] ' + args[1] + ' ' + args[3] } }).then((newTripRole) => {
+                                            new Trip({
+                                                tripName: args[1],
+                                                tripDate: args[2],
+                                                tripEmoji: args[3],
+                                                tripMessageId: newTripMsg.id,
+                                                tripRoleId: newTripRole.id
+                                            }).save().then((newTrip) => {
+                                                newTripMsg.react(newTrip.tripEmoji);
+                                            });
                                         });
-                                        message.guild.roles.create({ data: {name: '[Trip] ' + args[1] + ' ' + args[3] } });
                                     });
                                 }
                             });
