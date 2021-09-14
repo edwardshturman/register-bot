@@ -13,7 +13,7 @@ mongoose.connect(process.env.DBCONNECTION, () => {
 // Launch instance of Discord
 const { Client, Intents } = require('discord.js');
 const client = new Discord.Client({
-    intents: [Intents.FLAGS.GUIDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS],
+    intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS],
     partials: ['MESSAGE', 'GUILD_MEMBER', 'REACTION', 'USER']
 });
 
