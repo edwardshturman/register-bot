@@ -37,7 +37,7 @@ client.once('ready', () => {
 });
 
 // Check to make sure a message starts with the r. prefix, and that it's not sent by a bot
-client.on('message', async message => {
+client.on('messageCreate', async message => {
     if (!message.content.startsWith(prefix) || message.author.bot || message.author.id !== '373272898368176129') return; // Note: added check, return if not sent by me -Edward
 
     // Identify arguments by a space in the command and properly format
