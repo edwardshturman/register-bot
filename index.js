@@ -33,7 +33,7 @@ for (const file of commandFiles) {
 // Log launch, set status
 client.once('ready', () => {
     console.log('Register is online!');
-    client.user.setActivity('Edward go on his OCD spiral', { type: 'WATCHING' }).catch(console.error);
+    client.user.setActivity('Edward go on his OCD spiral', { type: 'WATCHING' });
 });
 
 // Check to make sure a message starts with the r. prefix, and that it's not sent by a bot
