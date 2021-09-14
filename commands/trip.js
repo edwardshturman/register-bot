@@ -1,5 +1,3 @@
-import node_fetch from 'node-fetch';
-
 module.exports = {
     name: 'trip',
     description: 'Trip command',
@@ -9,6 +7,7 @@ module.exports = {
         const mongoose = require('mongoose');
         const Trip = require('../config/trip-schema');
 
+        import node_fetch from 'node-fetch';
         global.fetch = node_fetch;
         const unsplash = require('unsplash-js').createApi({ accessKey: process.env.UNSPLASH_ACCESS_KEY });
 
