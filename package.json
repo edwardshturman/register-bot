@@ -34,15 +34,18 @@
     ]
   },
   "dependencies": {
-    "discord.js": "^12.5.3",
+    "discord.js": "^13.1.0",
     "dotenv": "^8.2.0",
-    "mongoose": "^5.13.5",
-    "node-fetch": "^2.6.1",
-    "request": "2.88.2",
+    "mongoose": "^6.0.5",
+    "node-fetch": "^3.0.0",
+    "request": "^2.88.2",
     "unsplash-js": "^7.0.15"
   },
   "devDependencies": {
     "mocha": "^8.2.1",
     "standardx": "^7.0.0"
+  },
+  "engines": {
+    "node": "16.9.1"
   }
 }
