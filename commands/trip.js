@@ -42,7 +42,7 @@ module.exports = {
                                         .addField('When:', args[2], false)
                                         .addField('Trip planning page:', args[4], false)
                                         .setFooter('Image by ' + results[0].user.name + ' on Unsplash');
-                                    message.channel.send(newTripEmbed).then((newTripMsg) => {
+                                    message.channel.send({ embeds: [newTripEmbed] }).then((newTripMsg) => {
                                         message.guild.roles.create({ data: {name: '[Trip] ' + args[1] + ' ' + args[3] } }).then((newTripRole) => {
                                             new Trip({
                                                 tripName: args[1],
@@ -79,7 +79,7 @@ module.exports = {
                                         .addField('Where:', args[1], false)
                                         .addField('When:', args[2], false)
                                         .setFooter('Image by ' + results[0].user.name + ' on Unsplash');
-                                    message.channel.send(newTripEmbed).then((newTripMsg) => {
+                                    message.channel.send({ embeds: [newTripEmbed] }).then((newTripMsg) => {
                                         message.guild.roles.create({ data: {name: '[Trip] ' + args[1] + ' ' + args[3] } }).then((newTripRole) => {
                                             new Trip({
                                                 tripName: args[1],
@@ -106,7 +106,7 @@ module.exports = {
                 .addField('add', 'r.trip add [name of trip] [date] [optional: link to trip planning page]', false)
                 .addField('remove', 'r.trip remove [name of trip]', false)
                 .addField('reschedule', 'r.trip rs [name of trip] [new date]', false);
-            message.channel.send(tripCommandEmbed);
+            message.channel.send({ embeds: [tripCommandEmbed] });
         } else if (args[0] !== 'add') {
             message.channel.send('The command does not yet support trip modification/deletion!');
         }
