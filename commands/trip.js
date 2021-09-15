@@ -7,9 +7,7 @@ module.exports = {
         const mongoose = require('mongoose');
         const Trip = require('../config/trip-schema');
 
-        const node_fetch = require('node-fetch');
-        global.fetch = node_fetch;
-        
+        global.fetch = require('node-fetch');
         const unsplash = require('unsplash-js').createApi({ accessKey: process.env.UNSPLASH_ACCESS_KEY });
 
         if (args[0] === 'add') {
