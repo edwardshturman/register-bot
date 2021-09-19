@@ -43,7 +43,7 @@ module.exports = {
                                         .addField('Trip planning page:', args[4], false)
                                         .setFooter('Image by ' + results[0].user.name + ' on Unsplash');
                                     message.channel.send({ embeds: [newTripEmbed] }).then((newTripMsg) => {
-                                        message.guild.roles.create({ data: {name: '[Trip] ' + args[1] + ' ' + args[3] } }).then((newTripRole) => {
+                                        message.guild.roles.create({ name: '[Trip] ' + args[1] + ' ' + args[3] }).then((newTripRole) => {
                                             new Trip({
                                                 tripName: args[1],
                                                 tripDate: args[2],
@@ -80,7 +80,7 @@ module.exports = {
                                         .addField('When:', args[2], false)
                                         .setFooter('Image by ' + results[0].user.name + ' on Unsplash');
                                     message.channel.send({ embeds: [newTripEmbed] }).then((newTripMsg) => {
-                                        message.guild.roles.create({ data: {name: '[Trip] ' + args[1] + ' ' + args[3] } }).then((newTripRole) => {
+                                        message.guild.roles.create({ name: '[Trip] ' + args[1] + ' ' + args[3] }).then((newTripRole) => {
                                             new Trip({
                                                 tripName: args[1],
                                                 tripDate: args[2],
