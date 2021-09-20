@@ -1,7 +1,10 @@
+const { SlashCommandBuilder } = require('@discordjs/builders');
+
 module.exports = {
-    name: 'ping',
-    description: 'The ping command.',
-    execute (message, args) {
-        message.channel.send('Pong!');
-    }
+    data: new SlashCommandBuilder()
+        .setName('ping')
+        .setDescription('Does exactly what you think it does :)'),
+    async execute (interaction) {
+        await interaction.reply('Pong!');
+    },
 };
