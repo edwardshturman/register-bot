@@ -11,8 +11,8 @@ mongoose.connect(process.env.DBCONNECTION, () => {
 });
 
 // Launch instance of Discord
-const { Client, Intents } = require('discord.js');
-const client = new Discord.Client({
+const { Client, Collection, Intents } = require('discord.js');
+const client = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS],
     partials: ['MESSAGE', 'GUILD_MEMBER', 'REACTION', 'USER']
 });
@@ -21,13 +21,13 @@ const client = new Discord.Client({
 const prefix = 'r.';
 
 // Create collection of commands
-client.commands = new Discord.Collection();
+client.commands = new Collection();
 
 // Check for correct filetype (JavaScript) and require command files when running given command
 const commandFiles = fs.readdirSync('./commands/').filter(file => file.endsWith('.js'));
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
-    client.commands.set(command.name, command);
+    client.commands.set(command.data.name, command);
 }
 
 // Log launch, set status
@@ -54,16 +54,18 @@ client.on('messageCreate', async message => {
 });
 
 client.on('interactionCreate', async interaction => {
-    if (!interaction.isCommand()) return;
 
-    const { commandName } = interaction;
+    const command = client.commands.get(interaction.commandName);
+    if (!command) return;
 
-    if (commandName === 'ping') {
-        await interaction.reply('Pong!');
-    } else if (commandName === 'server') {
-        await interaction.reply('Server info.');
-    } else if (commandName === 'user') {
-        await interaction.reply('User info.');
+    try {
+        await command.execute(interaction);
+    } catch (error) {
+        console.error(error);
+        await interaction.reply({
+            content: 'There was an error while executing this command!',
+            ephemeral: true
+        });
     }
 });
 
