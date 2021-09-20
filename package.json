@@ -14,7 +14,7 @@
   "private": true,
   "scripts": {
     "test": "standardx --env mocha",
-    "start": "node ."
+    "start": "node deploy-commands.js && node ."
   },
   "eslintConfig": {
     "rules": {
