@@ -36,6 +36,8 @@ client.once('ready', () => {
     client.user.setActivity('Edward go on his OCD spiral', { type: 'WATCHING' });
 });
 
+
+/*
 // Check to make sure a message starts with the r. prefix, and that it's not sent by a bot
 client.on('messageCreate', async message => {
     if (!message.content.startsWith(prefix) || message.author.bot || message.author.id !== '373272898368176129') return; // Note: added check, return if not sent by me -Edward
@@ -53,7 +55,12 @@ client.on('messageCreate', async message => {
     console.log(error);
 });
 
+ */
+
+
 client.on('interactionCreate', async interaction => {
+
+    // console.log(interaction);
 
     const command = client.commands.get(interaction.commandName);
     if (!command) return;
