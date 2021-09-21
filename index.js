@@ -11,8 +11,8 @@ mongoose.connect(process.env.DBCONNECTION, () => {
 });
 
 // Launch instance of Discord
-const { Client, Intents } = require('discord.js');
-const client = new Discord.Client({
+const { Client, Collection, Intents } = require('discord.js');
+const client = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS],
     partials: ['MESSAGE', 'GUILD_MEMBER', 'REACTION', 'USER']
 });
@@ -21,13 +21,13 @@ const client = new Discord.Client({
 const prefix = 'r.';
 
 // Create collection of commands
-client.commands = new Discord.Collection();
+client.commands = new Collection();
 
 // Check for correct filetype (JavaScript) and require command files when running given command
 const commandFiles = fs.readdirSync('./commands/').filter(file => file.endsWith('.js'));
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
-    client.commands.set(command.name, command);
+    client.commands.set(command.data.name, command);
 }
 
 // Log launch, set status
@@ -36,6 +36,8 @@ client.once('ready', () => {
     client.user.setActivity('Edward go on his OCD spiral', { type: 'WATCHING' });
 });
 
+
+/*
 // Check to make sure a message starts with the r. prefix, and that it's not sent by a bot
 client.on('messageCreate', async message => {
     if (!message.content.startsWith(prefix) || message.author.bot || message.author.id !== '373272898368176129') return; // Note: added check, return if not sent by me -Edward
@@ -52,6 +54,28 @@ client.on('messageCreate', async message => {
 }).on('error', () => {
     console.log(error);
 });
+
+ */
+
+
+client.on('interactionCreate', async interaction => {
+
+    // console.log(interaction);
+
+    const command = client.commands.get(interaction.commandName);
+    if (!command) return;
+
+    try {
+        await command.execute(interaction);
+    } catch (error) {
+        console.error(error);
+        await interaction.reply({
+            content: 'There was an error while executing this command!',
+            ephemeral: true
+        });
+    }
+});
+
 
 // ****************************** REACTION LISTENERS ******************************
 
