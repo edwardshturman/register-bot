@@ -90,10 +90,14 @@ client.on('messageReactionAdd', async (reaction, user) => {
     }
 
     Trip.findOne({ tripMessageId: reaction.message.id }).then((currentTrip) => {
-        if (reaction.emoji.name === currentTrip.tripEmoji) {
-            reaction.message.guild.members.fetch(user.id).then(member => {
-                member.roles.add(currentTrip.tripRoleId);
-            });
+        if (!currentTrip) {
+            return;
+        } else if (currentTrip) {
+            if (reaction.emoji.name === currentTrip.tripEmoji) {
+                reaction.message.guild.members.fetch(user.id).then(member => {
+                    member.roles.add(currentTrip.tripRoleId);
+                });
+            }
         }
     });
 });
@@ -112,10 +116,14 @@ client.on('messageReactionRemove', async (reaction, user) => {
     }
 
     Trip.findOne({ tripMessageId: reaction.message.id }).then((currentTrip) => {
-        if (reaction.emoji.name === currentTrip.tripEmoji) {
-            reaction.message.guild.members.fetch(user.id).then(member => {
-                member.roles.remove(currentTrip.tripRoleId);
-            });
+        if (!currentTrip) {
+            return;
+        } else if (currentTrip) {
+            if (reaction.emoji.name === currentTrip.tripEmoji) {
+                reaction.message.guild.members.fetch(user.id).then(member => {
+                    member.roles.remove(currentTrip.tripRoleId);
+                });
+            }
         }
     });
 });
