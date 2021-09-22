@@ -40,6 +40,15 @@ module.exports = {
                     tripDate
                         .setName('date')
                         .setDescription('The new date for the trip')
+                        .setRequired(true)))
+        .addSubcommand(cancelSubcommand =>
+            cancelSubcommand
+                .setName('cancel')
+                .setDescription('Cancel a trip :(')
+                .addStringOption(tripEmoji =>
+                    tripEmoji
+                        .setName('emoji')
+                        .setDescription('The unique emoji for the trip')
                         .setRequired(true))),
 
     async execute (interaction) {
@@ -127,6 +136,35 @@ module.exports = {
                 interaction.reply('Trip rescheduled! Check the original message for the new details.');
 
             });
+        } else if (interaction.options.getSubcommand() === 'cancel') {
+            // Dependencies
+            const Discord = require('discord.js');
+            const mongoose = require('mongoose');
+            const Trip = require('../config/trip-schema');
+
+            await Trip.findOne({ tripEmoji: interaction.options.getString('emoji') }).then((currentTrip) => {
+
+                interaction.channel.messages.fetch(currentTrip.tripMessageId).then((currentTripMsg) => {
+                    // console.log(currentTripMsg);
+
+                    const newTripEmbed = new Discord.MessageEmbed()
+                        .setColor('#ff0cff')
+                        .setTitle('[Canceled trip]')
+                        .setDescription('This trip was canceled :(')
+                        .setThumbnail(currentTripMsg.embeds[0].thumbnail.url)
+                        .addField('Where:', currentTrip.tripName, false)
+                        .addField('Was scheduled for:', currentTrip.tripDate, false)
+                        .setFooter(currentTripMsg.embeds[0].footer.text);
+                    currentTripMsg.edit({ embeds: [newTripEmbed] });
+                });
+
+                interaction.guild.roles.cache.get(currentTrip.tripRoleId).delete();
+
+            });
+
+            await Trip.deleteOne({ tripEmoji: interaction.options.getString('emoji') });
+            await interaction.reply('Trip canceled; the original message was edited accordingly :(');
+
         }
     }
 };
