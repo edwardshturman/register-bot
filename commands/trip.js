@@ -26,6 +26,20 @@ module.exports = {
                     tripEmoji
                         .setName('emoji')
                         .setDescription('A unique emoji for the trip')
+                        .setRequired(true)))
+        .addSubcommand(resceduleSubcommand =>
+            resceduleSubcommand
+                .setName('reschedule')
+                .setDescription('Reschedule a trip')
+                .addStringOption(tripEmoji =>
+                    tripEmoji
+                        .setName('emoji')
+                        .setDescription('The unique emoji for the trip')
+                        .setRequired(true))
+                .addStringOption(tripDate =>
+                    tripDate
+                        .setName('date')
+                        .setDescription('The new date for the trip')
                         .setRequired(true))),
 
     async execute (interaction) {
@@ -86,6 +100,32 @@ module.exports = {
                             });
                     });
                 }
+            });
+        } else if (interaction.options.getSubcommand() === 'reschedule') {
+            // Dependencies
+            const Discord = require('discord.js');
+            const mongoose = require('mongoose');
+            const Trip = require('../config/trip-schema');
+
+            await Trip.updateOne({ tripEmoji: interaction.options.getString('emoji') }, { tripDate: interaction.options.getString('date') });
+            await Trip.findOne({ tripEmoji: interaction.options.getString('emoji') }).then((currentTrip) => {
+
+                interaction.channel.messages.fetch(currentTrip.tripMessageId).then((currentTripMsg) => {
+                    // console.log(currentTripMsg);
+
+                    const newTripEmbed = new Discord.MessageEmbed()
+                        .setColor('#ff0cff')
+                        .setTitle('New Costco trip')
+                        .setDescription('React to this message to be given the associated role!')
+                        .setThumbnail(currentTripMsg.embeds[0].thumbnail.url)
+                        .addField('Where:', currentTrip.tripName, false)
+                        .addField('When:', currentTrip.tripDate, false)
+                        .setFooter(currentTripMsg.embeds[0].footer.text);
+                    currentTripMsg.edit({ embeds: [newTripEmbed] });
+                });
+
+                interaction.reply('Trip rescheduled! Check the original message for the new details.');
+
             });
         }
     }
