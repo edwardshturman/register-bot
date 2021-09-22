@@ -38,14 +38,14 @@
     "@discordjs/rest": "^0.1.0-canary.0",
     "discord-api-types": "^0.23.1",
     "discord.js": "^13.1.0",
-    "dotenv": "^8.2.0",
+    "dotenv": "^10.0.0",
     "mongoose": "^6.0.5",
     "node-fetch": "^2.6.2",
     "request": "^2.88.2",
     "unsplash-js": "^7.0.15"
   },
   "devDependencies": {
-    "mocha": "^8.2.1",
+    "mocha": "^9.1.1",
     "standardx": "^7.0.0"
   },
   "engines": {
