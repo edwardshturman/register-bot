@@ -7,7 +7,7 @@ module.exports = {
         .addSubcommand(helpSubcommand =>
             helpSubcommand
                 .setName('help')
-                .setDescription('Displays trip planning help'))
+                .setDescription('Display trip planning help'))
         .addSubcommand(addSubcommand =>
             addSubcommand
                 .setName('add')
@@ -72,41 +72,47 @@ module.exports = {
             global.fetch = require('node-fetch');
             const unsplash = require('unsplash-js').createApi({ accessKey: process.env.UNSPLASH_ACCESS_KEY });
 
-            unsplash.search.getPhotos({
-                query: interaction.options.getString('name'),
-                page: 1,
-                perPage: 10,
-                orderBy: 'relevant'
-            }).then(result => {
-                if (result.errors) {
-                    interaction.reply('Encountered an error fetching a thumbnail (check bot console)! To avoid confusion, trip was not created in database.');
-                    console.log(result.errors[0]);
-                } else {
-                    const feed = result.response;
-                    const { results } = feed;
-                    const newTripEmbed = new Discord.MessageEmbed()
-                        .setColor('#ff0cff')
-                        .setTitle('New Costco trip')
-                        .setDescription('React to this message to be given the associated role!')
-                        .setThumbnail(results[0].urls.regular)
-                        .addField('Where:', interaction.options.getString('name'), false)
-                        .addField('When:', interaction.options.getString('date'), false)
-                        .setFooter('Image by ' + results[0].user.name + ' on Unsplash');
-                    interaction.reply({ embeds: [newTripEmbed] }).then(async (newTripInteraction) => {
-                        const newTripMsg = await interaction.fetchReply();
-                        // console.log(newTripMsg);
-                        interaction.guild.roles.create({ name: '[Trip] ' + interaction.options.getString('name') + ' ' + interaction.options.getString('emoji') })
-                            .then((newTripRole) => {
-                                new Trip({
-                                    tripName: interaction.options.getString('name'),
-                                    tripDate: interaction.options.getString('date'),
-                                    tripEmoji: interaction.options.getString('emoji'),
-                                    tripMessageId: newTripMsg.id,
-                                    tripRoleId: newTripRole.id
-                                }).save().then((newTrip) => {
-                                    newTripMsg.react(newTrip.tripEmoji);
-                                });
+            Trip.findOne({ tripEmoji: interaction.options.getString('emoji') }).then((tripExists) => {
+                if (tripExists) {
+                    interaction.reply('This trip already exists! Try a different emoji.');
+                } else if (!tripExists) {
+                    unsplash.search.getPhotos({
+                        query: interaction.options.getString('name'),
+                        page: 1,
+                        perPage: 10,
+                        orderBy: 'relevant'
+                    }).then(result => {
+                        if (result.errors) {
+                            interaction.reply('Encountered an error fetching a thumbnail (check bot console)! To avoid confusion, trip was not created in database.');
+                            console.log(result.errors[0]);
+                        } else {
+                            const feed = result.response;
+                            const { results } = feed;
+                            const newTripEmbed = new Discord.MessageEmbed()
+                                .setColor('#ff0cff')
+                                .setTitle('New Costco trip')
+                                .setDescription('React to this message to be given the associated role!')
+                                .setThumbnail(results[0].urls.regular)
+                                .addField('Where:', interaction.options.getString('name'), false)
+                                .addField('When:', interaction.options.getString('date'), false)
+                                .setFooter('Image by ' + results[0].user.name + ' on Unsplash');
+                            interaction.reply({ embeds: [newTripEmbed] }).then(async (newTripInteraction) => {
+                                const newTripMsg = await interaction.fetchReply();
+                                // console.log(newTripMsg);
+                                interaction.guild.roles.create({ name: '[Trip] ' + interaction.options.getString('name') + ' ' + interaction.options.getString('emoji') })
+                                    .then((newTripRole) => {
+                                        new Trip({
+                                            tripName: interaction.options.getString('name'),
+                                            tripDate: interaction.options.getString('date'),
+                                            tripEmoji: interaction.options.getString('emoji'),
+                                            tripMessageId: newTripMsg.id,
+                                            tripRoleId: newTripRole.id
+                                        }).save().then((newTrip) => {
+                                            newTripMsg.react(newTrip.tripEmoji);
+                                        });
+                                    });
                             });
+                        }
                     });
                 }
             });
@@ -119,7 +125,7 @@ module.exports = {
             await Trip.updateOne({ tripEmoji: interaction.options.getString('emoji') }, { tripDate: interaction.options.getString('date') });
             await Trip.findOne({ tripEmoji: interaction.options.getString('emoji') }).then((currentTrip) => {
 
-                interaction.channel.messages.fetch(currentTrip.tripMessageId).then((currentTripMsg) => {
+                interaction.channel.messages.fetch(currentTrip.tripMessageId).then((currentTripMsg) => { // TODO: Make finding messages not dependent on the same channel
                     // console.log(currentTripMsg);
 
                     const newTripEmbed = new Discord.MessageEmbed()
