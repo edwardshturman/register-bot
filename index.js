@@ -33,9 +33,8 @@ for (const file of commandFiles) {
 // Log launch, set status
 client.once('ready', () => {
     console.log('Register is online!');
-    client.user.setActivity('Edward go on his OCD spiral', { type: 'WATCHING' });
+    client.user.setActivity('Kieran lose his mind', { type: 'WATCHING' });
 });
-
 
 /*
 // Check to make sure a message starts with the r. prefix, and that it's not sent by a bot
@@ -57,9 +56,7 @@ client.on('messageCreate', async message => {
 
  */
 
-
 client.on('interactionCreate', async interaction => {
-
     // console.log(interaction);
 
     const command = client.commands.get(interaction.commandName);
@@ -75,7 +72,6 @@ client.on('interactionCreate', async interaction => {
         });
     }
 });
-
 
 // ****************************** REACTION LISTENERS ******************************
 
@@ -93,16 +89,14 @@ client.on('messageReactionAdd', async (reaction, user) => {
         }
     }
 
-    Trip.findOne({tripMessageId: reaction.message.id}).then((currentTrip) => {
+    Trip.findOne({ tripMessageId: reaction.message.id }).then((currentTrip) => {
         if (reaction.emoji.name === currentTrip.tripEmoji) {
             reaction.message.guild.members.fetch(user.id).then(member => {
                 member.roles.add(currentTrip.tripRoleId);
             });
         }
-    })
+    });
 });
-
-
 
 client.on('messageReactionRemove', async (reaction, user) => {
     // When a reaction is received, check if the structure is partial
@@ -117,15 +111,14 @@ client.on('messageReactionRemove', async (reaction, user) => {
         }
     }
 
-    Trip.findOne({tripMessageId: reaction.message.id}).then((currentTrip) => {
+    Trip.findOne({ tripMessageId: reaction.message.id }).then((currentTrip) => {
         if (reaction.emoji.name === currentTrip.tripEmoji) {
             reaction.message.guild.members.fetch(user.id).then(member => {
                 member.roles.remove(currentTrip.tripRoleId);
             });
         }
-    })
+    });
 });
-
 
 /*
 

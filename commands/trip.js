@@ -8,7 +8,7 @@ module.exports = {
             helpSubcommand
                 .setName('help')
                 .setDescription('Displays trip planning help'))
-    .addSubcommand(addSubcommand =>
+        .addSubcommand(addSubcommand =>
             addSubcommand
                 .setName('add')
                 .setDescription('Create a new trip')
@@ -29,7 +29,6 @@ module.exports = {
                         .setRequired(true))),
 
     async execute (interaction) {
-
         // Dependencies
         const Discord = require('discord.js');
 
@@ -42,10 +41,7 @@ module.exports = {
                 .addField('reschedule', '/trip reschedule [trip emoji] [date]', false)
                 .addField('cancel', '/trip cancel [trip emoji]', false);
             await interaction.reply({ embeds: [tripHelpEmbed] });
-        }
-
-        else if (interaction.options.getSubcommand() === 'add') {
-
+        } else if (interaction.options.getSubcommand() === 'add') {
             // Dependencies
             const Discord = require('discord.js');
             const mongoose = require('mongoose');
@@ -76,19 +72,18 @@ module.exports = {
                     interaction.reply({ embeds: [newTripEmbed] }).then(async (newTripInteraction) => {
                         const newTripMsg = await interaction.fetchReply();
                         // console.log(newTripMsg);
-                        interaction.guild.roles.create({
-                            name: '[Trip] ' + interaction.options.getString('name') + ' ' + interaction.options.getString('emoji') })
+                        interaction.guild.roles.create({ name: '[Trip] ' + interaction.options.getString('name') + ' ' + interaction.options.getString('emoji') })
                             .then((newTripRole) => {
-                            new Trip({
-                                tripName: interaction.options.getString('name'),
-                                tripDate: interaction.options.getString('date'),
-                                tripEmoji: interaction.options.getString('emoji'),
-                                tripMessageId: newTripMsg.id,
-                                tripRoleId: newTripRole.id
-                            }).save().then((newTrip) => {
-                                newTripMsg.react(newTrip.tripEmoji);
+                                new Trip({
+                                    tripName: interaction.options.getString('name'),
+                                    tripDate: interaction.options.getString('date'),
+                                    tripEmoji: interaction.options.getString('emoji'),
+                                    tripMessageId: newTripMsg.id,
+                                    tripRoleId: newTripRole.id
+                                }).save().then((newTrip) => {
+                                    newTripMsg.react(newTrip.tripEmoji);
+                                });
                             });
-                        });
                     });
                 }
             });
