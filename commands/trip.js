@@ -3,7 +3,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('trip')
-        .setDescription('Tool for managing Costco trips')
+        .setDescription('Tool for planning and managing trips')
         .addSubcommand(helpSubcommand =>
             helpSubcommand
                 .setName('help')
@@ -58,7 +58,7 @@ module.exports = {
         if (interaction.options.getSubcommand() === 'help') {
             const tripHelpEmbed = new Discord.MessageEmbed()
                 .setColor('#ff0cff')
-                .setTitle('Costco trip command')
+                .setTitle('Trip command')
                 .setDescription('Used to create new trips and roles we can track/mention')
                 .addField('add', '/trip add [name of trip] [date] [trip emoji]', false)
                 .addField('reschedule', '/trip reschedule [trip emoji] [date]', false)
@@ -90,10 +90,9 @@ module.exports = {
                             const { results } = feed;
                             const newTripEmbed = new Discord.MessageEmbed()
                                 .setColor('#ff0cff')
-                                .setTitle('New Costco trip')
+                                .setTitle('New trip: ' + interaction.options.getString('name'))
                                 .setDescription('React to this message to be given the associated role!')
                                 .setThumbnail(results[0].urls.regular)
-                                .addField('Where:', interaction.options.getString('name'), false)
                                 .addField('When:', interaction.options.getString('date'), false)
                                 .setFooter('Image by ' + results[0].user.name + ' on Unsplash');
                             interaction.reply({ embeds: [newTripEmbed] }).then(async (newTripInteraction) => {
@@ -130,10 +129,9 @@ module.exports = {
 
                     const newTripEmbed = new Discord.MessageEmbed()
                         .setColor('#ff0cff')
-                        .setTitle('New Costco trip')
+                        .setTitle('New trip: ' + currentTrip.tripName)
                         .setDescription('React to this message to be given the associated role!')
                         .setThumbnail(currentTripMsg.embeds[0].thumbnail.url)
-                        .addField('Where:', currentTrip.tripName, false)
                         .addField('When:', currentTrip.tripDate, false)
                         .setFooter(currentTripMsg.embeds[0].footer.text);
                     currentTripMsg.edit({ embeds: [newTripEmbed] });
