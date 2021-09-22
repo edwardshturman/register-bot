@@ -3,9 +3,9 @@
   "author": "Edward Shturman",
   "bugs": "https://github.com/edwardshturman/register-bot/issues",
   "homepage": "https://github.com/edwardshturman/register-bot",
-  "version": "1.0.0",
+  "version": "0.1.2",
   "license": "UNLICENSED",
-  "description": "Costco #trip-planning bot",
+  "description": "Multifunctional Discord bot for trip planning",
   "repository": {
     "type": "git",
     "url": "https://github.com/edwardshturman/register-bot.git"
