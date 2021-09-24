@@ -67,7 +67,7 @@ module.exports = {
         } else if (interaction.options.getSubcommand() === 'add') {
             // Dependencies
             const Discord = require('discord.js');
-            const mongoose = require('mongoose');
+            require('mongoose');
             const Trip = require('../config/trip-schema');
             global.fetch = require('node-fetch');
             const unsplash = require('unsplash-js').createApi({ accessKey: process.env.UNSPLASH_ACCESS_KEY });
@@ -118,7 +118,7 @@ module.exports = {
         } else if (interaction.options.getSubcommand() === 'reschedule') {
             // Dependencies
             const Discord = require('discord.js');
-            const mongoose = require('mongoose');
+            require('mongoose');
             const Trip = require('../config/trip-schema');
 
             await Trip.updateOne({ tripEmoji: interaction.options.getString('emoji') }, { tripDate: interaction.options.getString('date') });
@@ -143,7 +143,7 @@ module.exports = {
         } else if (interaction.options.getSubcommand() === 'cancel') {
             // Dependencies
             const Discord = require('discord.js');
-            const mongoose = require('mongoose');
+            require('mongoose');
             const Trip = require('../config/trip-schema');
 
             await Trip.findOne({ tripEmoji: interaction.options.getString('emoji') }).then((currentTrip) => {
