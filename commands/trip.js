@@ -2,12 +2,16 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 
 module.exports = {
     data: new SlashCommandBuilder()
+
+        // Base trip command
         .setName('trip')
         .setDescription('Tool for planning and managing trips')
         .addSubcommand(helpSubcommand =>
             helpSubcommand
                 .setName('help')
                 .setDescription('Display trip planning help'))
+
+        // Add subcommand
         .addSubcommand(addSubcommand =>
             addSubcommand
                 .setName('add')
@@ -27,6 +31,8 @@ module.exports = {
                         .setName('emoji')
                         .setDescription('A unique emoji for the trip')
                         .setRequired(true)))
+
+        // Reschedule subcommand
         .addSubcommand(resceduleSubcommand =>
             resceduleSubcommand
                 .setName('reschedule')
@@ -41,6 +47,8 @@ module.exports = {
                         .setName('date')
                         .setDescription('The new date for the trip')
                         .setRequired(true)))
+
+        // Cancel subcommand
         .addSubcommand(cancelSubcommand =>
             cancelSubcommand
                 .setName('cancel')
@@ -55,6 +63,7 @@ module.exports = {
         // Dependencies
         const Discord = require('discord.js');
 
+        // On /trip help, display trip command help
         if (interaction.options.getSubcommand() === 'help') {
             const tripHelpEmbed = new Discord.MessageEmbed()
                 .setColor('#ff0cff')
@@ -64,6 +73,8 @@ module.exports = {
                 .addField('reschedule', '/trip reschedule [trip emoji] [date]', false)
                 .addField('cancel', '/trip cancel [trip emoji]', false);
             await interaction.reply({ embeds: [tripHelpEmbed] });
+
+        // Execute /trip add
         } else if (interaction.options.getSubcommand() === 'add') {
             // Dependencies
             const Discord = require('discord.js');
@@ -72,10 +83,13 @@ module.exports = {
             global.fetch = require('node-fetch');
             const unsplash = require('unsplash-js').createApi({ accessKey: process.env.UNSPLASH_ACCESS_KEY });
 
+            // Search for an existing trip emoji and return if it exists
             Trip.findOne({ tripEmoji: interaction.options.getString('emoji') }).then((tripExists) => {
                 if (tripExists) {
                     interaction.reply('This trip already exists! Try a different emoji.');
                 } else if (!tripExists) {
+
+                    // Fetch thumbnail from Unsplash
                     unsplash.search.getPhotos({
                         query: interaction.options.getString('name'),
                         page: 1,
@@ -88,6 +102,8 @@ module.exports = {
                         } else {
                             const feed = result.response;
                             const { results } = feed;
+
+                            // Create newTripEmbed using trip name, date, and Unsplash thumbnail with author info
                             const newTripEmbed = new Discord.MessageEmbed()
                                 .setColor('#ff0cff')
                                 .setTitle('New trip: ' + interaction.options.getString('name'))
@@ -95,11 +111,16 @@ module.exports = {
                                 .setThumbnail(results[0].urls.regular)
                                 .addField('When:', interaction.options.getString('date'), false)
                                 .setFooter('Image by ' + results[0].user.name + ' on Unsplash');
+
+                            // Send newTripEmbed, get message ID through newTripMsg
                             interaction.reply({ embeds: [newTripEmbed] }).then(async (newTripInteraction) => {
                                 const newTripMsg = await interaction.fetchReply();
-                                // console.log(newTripMsg);
+
+                                // Create a role for the trip using the trip name and unique emoji
                                 interaction.guild.roles.create({ name: '[Trip] ' + interaction.options.getString('name') + ' ' + interaction.options.getString('emoji') })
                                     .then((newTripRole) => {
+
+                                        // Create a trip in MongoDB using the trip name, date, unique emoji, newTripEmbed message ID, and the trip role ID
                                         new Trip({
                                             tripName: interaction.options.getString('name'),
                                             tripDate: interaction.options.getString('date'),
@@ -107,6 +128,8 @@ module.exports = {
                                             tripMessageId: newTripMsg.id,
                                             tripRoleId: newTripRole.id
                                         }).save().then((newTrip) => {
+
+                                            // React to the newTripEmbed with the trip unique emoji
                                             newTripMsg.react(newTrip.tripEmoji);
                                         });
                                     });
@@ -115,18 +138,24 @@ module.exports = {
                     });
                 }
             });
+
+        // Execute /trip reschedule
         } else if (interaction.options.getSubcommand() === 'reschedule') {
             // Dependencies
             const Discord = require('discord.js');
             require('mongoose');
             const Trip = require('../config/trip-schema');
 
+            // Using unique trip emoji, find trip and change date
             await Trip.updateOne({ tripEmoji: interaction.options.getString('emoji') }, { tripDate: interaction.options.getString('date') });
+
+            // Using unique trip emoji, find trip and pass currentTrip to use for editing original newTripEmbed
             await Trip.findOne({ tripEmoji: interaction.options.getString('emoji') }).then((currentTrip) => {
 
+                // Search for newTripEmbed message in channel where /trip reschedule command is used
                 interaction.channel.messages.fetch(currentTrip.tripMessageId).then((currentTripMsg) => { // TODO: Make finding messages not dependent on the same channel
-                    // console.log(currentTripMsg);
 
+                    // Edit original newTripEmbed
                     const newTripEmbed = new Discord.MessageEmbed()
                         .setColor('#ff0cff')
                         .setTitle('New trip: ' + currentTrip.tripName)
@@ -140,17 +169,21 @@ module.exports = {
                 interaction.reply('Trip rescheduled! Check the original message for the new details.');
 
             });
+
+        // Execute /trip cancel
         } else if (interaction.options.getSubcommand() === 'cancel') {
             // Dependencies
             const Discord = require('discord.js');
             require('mongoose');
             const Trip = require('../config/trip-schema');
 
+            // Using unique trip emoji, find trip and pass currentTrip to use for editing original newTripEmbed
             await Trip.findOne({ tripEmoji: interaction.options.getString('emoji') }).then((currentTrip) => {
 
+                // Search for newTripEmbed message in channel where /trip cancel command is used
                 interaction.channel.messages.fetch(currentTrip.tripMessageId).then((currentTripMsg) => {
-                    // console.log(currentTripMsg);
 
+                    // Edit original newTripEmbed
                     const newTripEmbed = new Discord.MessageEmbed()
                         .setColor('#ff0cff')
                         .setTitle('[Canceled trip]')
@@ -162,10 +195,12 @@ module.exports = {
                     currentTripMsg.edit({ embeds: [newTripEmbed] });
                 });
 
+                // Delete trip role
                 interaction.guild.roles.cache.get(currentTrip.tripRoleId).delete();
 
             });
 
+            // Find trip using unique emoji and delete from MongoDB
             await Trip.deleteOne({ tripEmoji: interaction.options.getString('emoji') });
             await interaction.reply('Trip canceled; the original message was edited accordingly :(');
 

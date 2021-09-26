@@ -20,7 +20,7 @@ const client = new Client({
 // Create collection of commands
 client.commands = new Collection();
 
-// Check for correct filetype (JavaScript) and require command files when running given command
+// Check for correct file type (JavaScript) and require command files when running given command
 const commandFiles = fs.readdirSync('./commands/').filter(file => file.endsWith('.js'));
 for (const file of commandFiles) {
     const command = require(`./commands/${file}`);
@@ -33,14 +33,7 @@ client.once('ready', () => {
     client.user.setActivity('VALORANT', { type: 'PLAYING' });
 });
 
-// messageCreate listener for Rohan Reddit reactions
-client.on('messageCreate', async message => {
-    if (message.author.id !== '294316141457702912') return;
-    await message.react('889368734937010216');
-    await message.react('889386692174307329');
-    await message.react('889382600148410398');
-});
-
+// Interaction listener for slash commands
 client.on('interactionCreate', async interaction => {
     // console.log(interaction);
 
@@ -60,6 +53,7 @@ client.on('interactionCreate', async interaction => {
 
 // ****************************** REACTION LISTENERS ******************************
 
+// Message reaction listener
 client.on('messageReactionAdd', async (reaction, user) => {
     // When a reaction is received, check if the structure is partial
     if (reaction.partial) {
@@ -74,6 +68,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
         }
     }
 
+    // Check to see if a reaction is on a trip message; if it is, add the trip role to the user reacting
     Trip.findOne({ tripMessageId: reaction.message.id }).then((currentTrip) => {
         if (currentTrip) {
             if (reaction.emoji.name === currentTrip.tripEmoji) {
@@ -85,6 +80,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
     });
 });
 
+// Message reaction removal listener
 client.on('messageReactionRemove', async (reaction, user) => {
     // When a reaction is received, check if the structure is partial
     if (reaction.partial) {
@@ -98,6 +94,7 @@ client.on('messageReactionRemove', async (reaction, user) => {
         }
     }
 
+    // Check to see if a reaction is on a trip message; if it is, remove the trip role from the user reacting
     Trip.findOne({ tripMessageId: reaction.message.id }).then((currentTrip) => {
         if (currentTrip) {
             if (reaction.emoji.name === currentTrip.tripEmoji) {
