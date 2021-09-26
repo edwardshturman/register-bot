@@ -146,29 +146,34 @@ module.exports = {
             require('mongoose');
             const Trip = require('../config/trip-schema');
 
-            // Using unique trip emoji, find trip and change date
-            await Trip.updateOne({ tripEmoji: interaction.options.getString('emoji') }, { tripDate: interaction.options.getString('date') });
-
             // Using unique trip emoji, find trip and pass currentTrip to use for editing original newTripEmbed
-            await Trip.findOne({ tripEmoji: interaction.options.getString('emoji') }).then((currentTrip) => {
+            await Trip.findOne({ tripEmoji: interaction.options.getString('emoji') }).then(async (currentTrip) => {
 
-                // Search for newTripEmbed message in channel where /trip reschedule command is used
-                interaction.channel.messages.fetch(currentTrip.tripMessageId).then((currentTripMsg) => { // TODO: Make finding messages not dependent on the same channel
+                // Check if trip exists using unique emoji, ignore if it doesn't
+                if (!currentTrip) {
+                    await interaction.reply('Couldn\'t find that trip! Try a different emoji.');
+                } else if (currentTrip) {
 
-                    // Edit original newTripEmbed
-                    const newTripEmbed = new Discord.MessageEmbed()
-                        .setColor('#ff0cff')
-                        .setTitle('New trip: ' + currentTrip.tripName)
-                        .setDescription('React to this message to be given the associated role!')
-                        .setThumbnail(currentTripMsg.embeds[0].thumbnail.url)
-                        .addField('When:', currentTrip.tripDate, false)
-                        .setFooter(currentTripMsg.embeds[0].footer.text);
-                    currentTripMsg.edit({ embeds: [newTripEmbed] });
-                });
+                    // Using unique trip emoji, find trip and change date
+                    await Trip.updateOne({ tripEmoji: interaction.options.getString('emoji') }, { tripDate: interaction.options.getString('date') });
 
-                interaction.reply('Trip rescheduled! Check the original message for the new details.');
+                    // Search for newTripEmbed message in channel where /trip reschedule command is used
+                    await interaction.channel.messages.fetch(currentTrip.tripMessageId).then((currentTripMsg) => { // TODO: Make finding messages not dependent on the same channel
 
-            });
+                        // Edit original newTripEmbed
+                        const newTripEmbed = new Discord.MessageEmbed()
+                            .setColor('#ff0cff')
+                            .setTitle('New trip: ' + currentTrip.tripName)
+                            .setDescription('React to this message to be given the associated role!')
+                            .setThumbnail(currentTripMsg.embeds[0].thumbnail.url)
+                            .addField('When:', currentTrip.tripDate, false)
+                            .setFooter(currentTripMsg.embeds[0].footer.text);
+                        currentTripMsg.edit({ embeds: [newTripEmbed] });
+                    });
+
+                    await interaction.reply('Trip rescheduled! Check the original message for the new details.');
+
+            }});
 
         // Execute /trip cancel
         } else if (interaction.options.getSubcommand() === 'cancel') {
@@ -178,32 +183,37 @@ module.exports = {
             const Trip = require('../config/trip-schema');
 
             // Using unique trip emoji, find trip and pass currentTrip to use for editing original newTripEmbed
-            await Trip.findOne({ tripEmoji: interaction.options.getString('emoji') }).then((currentTrip) => {
+            await Trip.findOne({ tripEmoji: interaction.options.getString('emoji') }).then(async (currentTrip) => {
 
-                // Search for newTripEmbed message in channel where /trip cancel command is used
-                interaction.channel.messages.fetch(currentTrip.tripMessageId).then((currentTripMsg) => {
+                // Check if trip exists using unique emoji, ignore if it doesn't
+                if (!currentTrip) {
+                    await interaction.reply('Couldn\'t find that trip! Try a different emoji.');
+                } else if (currentTrip) {
 
-                    // Edit original newTripEmbed
-                    const newTripEmbed = new Discord.MessageEmbed()
-                        .setColor('#ff0cff')
-                        .setTitle('[Canceled trip]')
-                        .setDescription('This trip was canceled :(')
-                        .setThumbnail(currentTripMsg.embeds[0].thumbnail.url)
-                        .addField('Where:', currentTrip.tripName, false)
-                        .addField('Was scheduled for:', currentTrip.tripDate, false)
-                        .setFooter(currentTripMsg.embeds[0].footer.text);
-                    currentTripMsg.edit({ embeds: [newTripEmbed] });
-                });
+                    // Search for newTripEmbed message in channel where /trip cancel command is used
+                    await interaction.channel.messages.fetch(currentTrip.tripMessageId).then((currentTripMsg) => {
 
-                // Delete trip role
-                interaction.guild.roles.cache.get(currentTrip.tripRoleId).delete();
+                        // Edit original newTripEmbed
+                        const newTripEmbed = new Discord.MessageEmbed()
+                            .setColor('#ff0cff')
+                            .setTitle('[Canceled trip]')
+                            .setDescription('This trip was canceled :(')
+                            .setThumbnail(currentTripMsg.embeds[0].thumbnail.url)
+                            .addField('Where:', currentTrip.tripName, false)
+                            .addField('Was scheduled for:', currentTrip.tripDate, false)
+                            .setFooter(currentTripMsg.embeds[0].footer.text);
+                        currentTripMsg.edit({ embeds: [newTripEmbed] });
+                    });
 
+                    // Delete trip role
+                    await interaction.guild.roles.cache.get(currentTrip.tripRoleId).delete();
+
+                    // Find trip using unique emoji and delete from MongoDB
+                    await Trip.deleteOne({ tripEmoji: interaction.options.getString('emoji') });
+                    await interaction.reply('Trip canceled; the original message was edited accordingly :(');
+
+                }
             });
-
-            // Find trip using unique emoji and delete from MongoDB
-            await Trip.deleteOne({ tripEmoji: interaction.options.getString('emoji') });
-            await interaction.reply('Trip canceled; the original message was edited accordingly :(');
-
         }
     }
 };
