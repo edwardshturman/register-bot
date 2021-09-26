@@ -158,17 +158,22 @@ module.exports = {
                     await Trip.updateOne({ tripEmoji: interaction.options.getString('emoji') }, { tripDate: interaction.options.getString('date') });
 
                     // Search for newTripEmbed message in channel where /trip reschedule command is used
-                    await interaction.channel.messages.fetch(currentTrip.tripMessageId).then((currentTripMsg) => { // TODO: Make finding messages not dependent on the same channel
+                    await interaction.channel.messages.fetch(currentTrip.tripMessageId).then((currentTripMsg) => {
 
-                        // Edit original newTripEmbed
-                        const newTripEmbed = new Discord.MessageEmbed()
-                            .setColor('#ff0cff')
-                            .setTitle('New trip: ' + currentTrip.tripName)
-                            .setDescription('React to this message to be given the associated role!')
-                            .setThumbnail(currentTripMsg.embeds[0].thumbnail.url)
-                            .addField('When:', currentTrip.tripDate, false)
-                            .setFooter(currentTripMsg.embeds[0].footer.text);
-                        currentTripMsg.edit({ embeds: [newTripEmbed] });
+                        if (!currentTripMsg) {
+                            interaction.reply('Couldn\'t find that trip! Try searching in the channel where it was created.');
+                        } else if (currentTripMsg) {
+
+                            // Edit original newTripEmbed
+                            const newTripEmbed = new Discord.MessageEmbed()
+                                .setColor('#ff0cff')
+                                .setTitle('New trip: ' + currentTrip.tripName)
+                                .setDescription('React to this message to be given the associated role!')
+                                .setThumbnail(currentTripMsg.embeds[0].thumbnail.url)
+                                .addField('When:', currentTrip.tripDate, false)
+                                .setFooter(currentTripMsg.embeds[0].footer.text);
+                            currentTripMsg.edit({ embeds: [newTripEmbed] });
+                        }
                     });
 
                     await interaction.reply('Trip rescheduled! Check the original message for the new details.');
@@ -193,16 +198,21 @@ module.exports = {
                     // Search for newTripEmbed message in channel where /trip cancel command is used
                     await interaction.channel.messages.fetch(currentTrip.tripMessageId).then((currentTripMsg) => {
 
-                        // Edit original newTripEmbed
-                        const newTripEmbed = new Discord.MessageEmbed()
-                            .setColor('#ff0cff')
-                            .setTitle('[Canceled trip]')
-                            .setDescription('This trip was canceled :(')
-                            .setThumbnail(currentTripMsg.embeds[0].thumbnail.url)
-                            .addField('Where:', currentTrip.tripName, false)
-                            .addField('Was scheduled for:', currentTrip.tripDate, false)
-                            .setFooter(currentTripMsg.embeds[0].footer.text);
-                        currentTripMsg.edit({ embeds: [newTripEmbed] });
+                        if (!currentTripMsg) {
+                            interaction.reply('Couldn\'t find that trip! Try searching in the channel where it was created.');
+                        } else if (currentTripMsg) {
+
+                            // Edit original newTripEmbed
+                            const newTripEmbed = new Discord.MessageEmbed()
+                                .setColor('#ff0cff')
+                                .setTitle('[Canceled trip]')
+                                .setDescription('This trip was canceled :(')
+                                .setThumbnail(currentTripMsg.embeds[0].thumbnail.url)
+                                .addField('Where:', currentTrip.tripName, false)
+                                .addField('Was scheduled for:', currentTrip.tripDate, false)
+                                .setFooter(currentTripMsg.embeds[0].footer.text);
+                            currentTripMsg.edit({ embeds: [newTripEmbed] });
+                        }
                     });
 
                     // Delete trip role
