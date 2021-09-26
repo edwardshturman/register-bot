@@ -73,7 +73,11 @@ client.on('messageReactionAdd', async (reaction, user) => {
         if (currentTrip) {
             if (reaction.emoji.name === currentTrip.tripEmoji) {
                 reaction.message.guild.members.fetch(user.id).then(member => {
-                    member.roles.add(currentTrip.tripRoleId);
+
+                    // Ignore trip message reactions if by a bot
+                    if (!member.user.bot) {
+                        member.roles.add(currentTrip.tripRoleId);
+                    }
                 });
             }
         }
