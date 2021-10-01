@@ -21,16 +21,56 @@ module.exports = {
                         .setName('name')
                         .setDescription('The name of the trip; best if named by location')
                         .setRequired(true))
+                .addStringOption(tripEmoji =>
+                    tripEmoji
+                        .setName('emoji')
+                        .setDescription('A unique emoji for the trip')
+                        .setRequired(true))
                 .addStringOption(tripDate =>
                     tripDate
                         .setName('date')
                         .setDescription('The date of the trip; can be specific or arbitrary')
                         .setRequired(true))
-                .addStringOption(tripEmoji =>
-                    tripEmoji
-                        .setName('emoji')
-                        .setDescription('A unique emoji for the trip')
-                        .setRequired(true)))
+                .addStringOption(tripDate2 =>
+                    tripDate2
+                        .setName('date2')
+                        .setDescription('Another potential date for the trip')
+                        .setRequired(false))
+                .addStringOption(tripDate3 =>
+                    tripDate3
+                        .setName('date3')
+                        .setDescription('Another potential date for the trip')
+                        .setRequired(false))
+                .addStringOption(tripDate4 =>
+                    tripDate4
+                        .setName('date4')
+                        .setDescription('Another potential date for the trip')
+                        .setRequired(false))
+                .addStringOption(tripDate5 =>
+                    tripDate5
+                        .setName('date5')
+                        .setDescription('Another potential date for the trip')
+                        .setRequired(false))
+                .addStringOption(tripDate6 =>
+                    tripDate6
+                        .setName('date6')
+                        .setDescription('Another potential date for the trip')
+                        .setRequired(false))
+                .addStringOption(tripDate7 =>
+                    tripDate7
+                        .setName('date7')
+                        .setDescription('Another potential date for the trip')
+                        .setRequired(false))
+                .addStringOption(tripDate8 =>
+                    tripDate8
+                        .setName('date8')
+                        .setDescription('Another potential date for the trip')
+                        .setRequired(false))
+                .addStringOption(tripDate9 =>
+                    tripDate9
+                        .setName('date9')
+                        .setDescription('Another potential date for the trip')
+                        .setRequired(false)))
 
         // Reschedule subcommand
         .addSubcommand(resceduleSubcommand =>
