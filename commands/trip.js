@@ -45,31 +45,6 @@ module.exports = {
                     tripDate4
                         .setName('date4')
                         .setDescription('Another potential date for the trip')
-                        .setRequired(false))
-                .addStringOption(tripDate5 =>
-                    tripDate5
-                        .setName('date5')
-                        .setDescription('Another potential date for the trip')
-                        .setRequired(false))
-                .addStringOption(tripDate6 =>
-                    tripDate6
-                        .setName('date6')
-                        .setDescription('Another potential date for the trip')
-                        .setRequired(false))
-                .addStringOption(tripDate7 =>
-                    tripDate7
-                        .setName('date7')
-                        .setDescription('Another potential date for the trip')
-                        .setRequired(false))
-                .addStringOption(tripDate8 =>
-                    tripDate8
-                        .setName('date8')
-                        .setDescription('Another potential date for the trip')
-                        .setRequired(false))
-                .addStringOption(tripDate9 =>
-                    tripDate9
-                        .setName('date9')
-                        .setDescription('Another potential date for the trip')
                         .setRequired(false)))
 
         // Reschedule subcommand
@@ -143,37 +118,162 @@ module.exports = {
                             const feed = result.response;
                             const { results } = feed;
 
-                            // Create newTripEmbed using trip name, date, and Unsplash thumbnail with author info
-                            const newTripEmbed = new Discord.MessageEmbed()
-                                .setColor('#ff0cff')
-                                .setTitle('New trip: ' + interaction.options.getString('name'))
-                                .setDescription('React to this message to be given the associated role!')
-                                .setThumbnail(results[0].urls.regular)
-                                .addField('When:', interaction.options.getString('date'), false)
-                                .setFooter('Image by ' + results[0].user.name + ' on Unsplash');
+                            // Check if there are multiple date options
+                            if (!interaction.options.getString('date2')) {
 
-                            // Send newTripEmbed, get message ID through newTripMsg
-                            interaction.reply({ embeds: [newTripEmbed] }).then(async (newTripInteraction) => {
-                                const newTripMsg = await interaction.fetchReply();
+                                // Create newTripEmbed using trip name, date, and Unsplash thumbnail with author info
+                                const newTripEmbed = new Discord.MessageEmbed()
+                                    .setColor('#ff0cff')
+                                    .setTitle('New trip: ' + interaction.options.getString('name'))
+                                    .setDescription('React to this message to be given the associated role!')
+                                    .setThumbnail(results[0].urls.regular)
+                                    .addField('When:', interaction.options.getString('date'), false)
+                                    .setFooter('Image by ' + results[0].user.name + ' on Unsplash');
 
-                                // Create a role for the trip using the trip name and unique emoji
-                                interaction.guild.roles.create({ name: '[Trip] ' + interaction.options.getString('name') + ' ' + interaction.options.getString('emoji') })
-                                    .then((newTripRole) => {
+                                // Send newTripEmbed, get message ID through newTripMsg
+                                interaction.reply({ embeds: [newTripEmbed] }).then(async (newTripInteraction) => {
+                                    const newTripMsg = await interaction.fetchReply();
 
-                                        // Create a trip in MongoDB using the trip name, date, unique emoji, newTripEmbed message ID, and the trip role ID
-                                        new Trip({
-                                            tripName: interaction.options.getString('name'),
-                                            tripDate: interaction.options.getString('date'),
-                                            tripEmoji: interaction.options.getString('emoji'),
-                                            tripMessageId: newTripMsg.id,
-                                            tripRoleId: newTripRole.id
-                                        }).save().then((newTrip) => {
+                                    // Create a role for the trip using the trip name and unique emoji
+                                    interaction.guild.roles.create({ name: '[Trip] ' + interaction.options.getString('name') + ' ' + interaction.options.getString('emoji') })
+                                        .then((newTripRole) => {
 
-                                            // React to the newTripEmbed with the trip unique emoji
-                                            newTripMsg.react(newTrip.tripEmoji);
+                                            // Create a trip in MongoDB using the trip name, date, unique emoji, newTripEmbed message ID, and the trip role ID
+                                            new Trip({
+                                                tripName: interaction.options.getString('name'),
+                                                tripDate: interaction.options.getString('date'),
+                                                tripEmoji: interaction.options.getString('emoji'),
+                                                tripMessageId: newTripMsg.id,
+                                                tripRoleId: newTripRole.id
+                                            }).save().then((newTrip) => {
+
+                                                // React to the newTripEmbed with the trip unique emoji
+                                                newTripMsg.react(newTrip.tripEmoji);
+                                            });
                                         });
+                                });
+
+                            } else if (interaction.options.getString('date2')) {
+
+                                if (interaction.options.getString('date3')) {
+
+                                    if (interaction.options.getString('date4')) {
+
+                                        // Four options for trip date exist; create newTripEmbed using trip name and Unsplash thumbnail with author info
+                                        const newTripEmbed = new Discord.MessageEmbed()
+                                            .setColor('#ff0cff')
+                                            .setTitle('New trip: ' + interaction.options.getString('name'))
+                                            .setDescription('React to this message to indicate which day(s) you can go!')
+                                            .setThumbnail(results[0].urls.regular)
+                                            .addField('When:', `:one: ${interaction.options.getString('date')}\n:two: ${interaction.options.getString('date2')}\n:three: ${interaction.options.getString('date3')}\n:four: ${interaction.options.getString('date4')}`, false)
+                                            .setFooter('Image by ' + results[0].user.name + ' on Unsplash');
+
+                                        // Send newTripEmbed, get message ID through newTripMsg
+                                        interaction.reply({ embeds: [newTripEmbed] }).then(async (newTripInteraction) => {
+                                            const newTripMsg = await interaction.fetchReply();
+
+                                            // Create a role for the trip using the trip name and unique emoji
+                                            interaction.guild.roles.create({ name: '[Trip] ' + interaction.options.getString('name') + ' ' + interaction.options.getString('emoji') })
+                                                .then((newTripRole) => {
+
+                                                    // Create a trip in MongoDB using the trip name, date, unique emoji, newTripEmbed message ID, and the trip role ID
+                                                    new Trip({
+                                                        tripName: interaction.options.getString('name'),
+                                                        tripDate: 'TBD',
+                                                        tripEmoji: interaction.options.getString('emoji'),
+                                                        tripMessageId: newTripMsg.id,
+                                                        tripRoleId: newTripRole.id
+                                                    }).save().then((newTrip) => {
+
+                                                        // React to the newTripEmbed with the trip date options
+                                                        newTripMsg.react('1️⃣');
+                                                        newTripMsg.react('2️⃣');
+                                                        newTripMsg.react('3️⃣');
+                                                        newTripMsg.react('4️⃣');
+                                                    });
+                                                });
+                                        });
+
+
+                                    } else if (!interaction.options.getString('date4')) {
+
+                                        // Three options for trip date exist; create newTripEmbed using trip name and Unsplash thumbnail with author info
+                                        const newTripEmbed = new Discord.MessageEmbed()
+                                            .setColor('#ff0cff')
+                                            .setTitle('New trip: ' + interaction.options.getString('name'))
+                                            .setDescription('React to this message to indicate which day(s) you can go!')
+                                            .setThumbnail(results[0].urls.regular)
+                                            .addField('When:', `:one: ${interaction.options.getString('date')}\n:two: ${interaction.options.getString('date2')}\n:three: ${interaction.options.getString('date3')}`, false)
+                                            .setFooter('Image by ' + results[0].user.name + ' on Unsplash');
+
+                                        // Send newTripEmbed, get message ID through newTripMsg
+                                        interaction.reply({ embeds: [newTripEmbed] }).then(async (newTripInteraction) => {
+                                            const newTripMsg = await interaction.fetchReply();
+
+                                            // Create a role for the trip using the trip name and unique emoji
+                                            interaction.guild.roles.create({ name: '[Trip] ' + interaction.options.getString('name') + ' ' + interaction.options.getString('emoji') })
+                                                .then((newTripRole) => {
+
+                                                    // Create a trip in MongoDB using the trip name, date, unique emoji, newTripEmbed message ID, and the trip role ID
+                                                    new Trip({
+                                                        tripName: interaction.options.getString('name'),
+                                                        tripDate: 'TBD',
+                                                        tripEmoji: interaction.options.getString('emoji'),
+                                                        tripMessageId: newTripMsg.id,
+                                                        tripRoleId: newTripRole.id
+                                                    }).save().then((newTrip) => {
+
+                                                        // React to the newTripEmbed with the trip date options
+                                                        newTripMsg.react('1️⃣');
+                                                        newTripMsg.react('2️⃣');
+                                                        newTripMsg.react('3️⃣');
+                                                    });
+                                                });
+                                        });
+
+                                    }
+
+                                }
+
+                                else if (!interaction.options.getString('date3')) {
+
+                                    // Two options for trip date exist; create newTripEmbed using trip name and Unsplash thumbnail with author info
+                                    const newTripEmbed = new Discord.MessageEmbed()
+                                        .setColor('#ff0cff')
+                                        .setTitle('New trip: ' + interaction.options.getString('name'))
+                                        .setDescription('React to this message to indicate which day(s) you can go!')
+                                        .setThumbnail(results[0].urls.regular)
+                                        .addField('When:', `:one: ${interaction.options.getString('date')}\n:two: ${interaction.options.getString('date2')}`, false)
+                                        .setFooter('Image by ' + results[0].user.name + ' on Unsplash');
+
+                                    // Send newTripEmbed, get message ID through newTripMsg
+                                    interaction.reply({ embeds: [newTripEmbed] }).then(async (newTripInteraction) => {
+                                        const newTripMsg = await interaction.fetchReply();
+
+                                        // Create a role for the trip using the trip name and unique emoji
+                                        interaction.guild.roles.create({ name: '[Trip] ' + interaction.options.getString('name') + ' ' + interaction.options.getString('emoji') })
+                                            .then((newTripRole) => {
+
+                                                // Create a trip in MongoDB using the trip name, date, unique emoji, newTripEmbed message ID, and the trip role ID
+                                                new Trip({
+                                                    tripName: interaction.options.getString('name'),
+                                                    tripDate: 'TBD',
+                                                    tripEmoji: interaction.options.getString('emoji'),
+                                                    tripMessageId: newTripMsg.id,
+                                                    tripRoleId: newTripRole.id
+                                                }).save().then((newTrip) => {
+
+                                                    // React to the newTripEmbed with the trip date options
+                                                    newTripMsg.react('1️⃣');
+                                                    newTripMsg.react('2️⃣');
+                                                });
+                                            });
                                     });
-                            });
+
+                                }
+
+                            }
+
                         }
                     });
                 }
