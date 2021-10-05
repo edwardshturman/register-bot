@@ -295,28 +295,35 @@ module.exports = {
                 } else if (currentTrip) {
 
                     // Using unique trip emoji, find trip and change date
-                    await Trip.updateOne({ tripEmoji: interaction.options.getString('emoji') }, { tripDate: interaction.options.getString('date') });
+                    await Trip.updateOne({ tripEmoji: interaction.options.getString('emoji') }, { tripDate: interaction.options.getString('date') }).then(async () => {
 
-                    // Search for newTripEmbed message in channel where /trip reschedule command is used
-                    await interaction.channel.messages.fetch(currentTrip.tripMessageId).then((currentTripMsg) => {
+                        // Search for newTripEmbed message in channel where /trip reschedule command is used
+                        await interaction.channel.messages.fetch(currentTrip.tripMessageId).then((currentTripMsg) => {
 
-                        if (!currentTripMsg) {
-                            interaction.reply('Couldn\'t find that trip! Try searching in the channel where it was created.');
-                        } else if (currentTripMsg) {
+                            if (!currentTripMsg) {
+                                interaction.reply('Couldn\'t find that trip! Try searching in the channel where it was created.');
+                            } else if (currentTripMsg) {
 
-                            // Edit original newTripEmbed
-                            const newTripEmbed = new Discord.MessageEmbed()
-                                .setColor('#ff0cff')
-                                .setTitle('New trip: ' + currentTrip.tripName)
-                                .setDescription('React to this message to be given the associated role!')
-                                .setThumbnail(currentTripMsg.embeds[0].thumbnail.url)
-                                .addField('When:', currentTrip.tripDate, false)
-                                .setFooter(currentTripMsg.embeds[0].footer.text);
-                            currentTripMsg.edit({ embeds: [newTripEmbed] });
-                        }
+                                // Edit original newTripEmbed
+                                const newTripEmbed = new Discord.MessageEmbed()
+                                    .setColor('#ff0cff')
+                                    .setTitle('New trip: ' + currentTrip.tripName)
+                                    .setDescription('React to this message to be given the associated role!')
+                                    .setThumbnail(currentTripMsg.embeds[0].thumbnail.url)
+                                    .addField('When:', interaction.options.getString('date'), false)
+                                    .setFooter(currentTripMsg.embeds[0].footer.text);
+                                currentTripMsg.edit({ embeds: [newTripEmbed] });
+
+                                // Unsure if removing reactions on reschedule is ideal
+                                // Would make it cleaner if there are >1 date options, but may be counterintuitive for agreed-upon reschedules
+                                // currentTripMsg.reactions.removeAll();
+                                currentTripMsg.react(interaction.options.getString('emoji'));
+                            }
+                        });
+
+                        await interaction.reply('Trip rescheduled! Check the original message for the new details.');
+
                     });
-
-                    await interaction.reply('Trip rescheduled! Check the original message for the new details.');
 
             }});
 
