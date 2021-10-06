@@ -6,8 +6,7 @@ const tripSchema = new Schema({
     tripDate: String,
     tripEmoji: String,
     tripMessageId: String,
-    tripRoleId: String,
-    tripPlanningLink: String
+    tripRoleId: String
 });
 
 const Trip = mongoose.model('trip', tripSchema);
