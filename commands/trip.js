@@ -111,12 +111,23 @@ module.exports = {
                         perPage: 10,
                         orderBy: 'relevant'
                     }).then(result => {
+                        let thumbnailUrl;
+                        let thumbnailFooter;
                         if (result.errors) {
                             interaction.reply('Encountered an error fetching a thumbnail (check bot console)! To avoid confusion, trip was not created in database.');
                             console.log(result.errors[0]);
                         } else {
                             const feed = result.response;
                             const { results } = feed;
+
+                            // If image search doesn't return any results, set embed thumbnail to Register logo
+                            if (!results[0]) {
+                                thumbnailUrl = 'https://raw.githubusercontent.com/edwardshturman/register-bot/master/assets/register-logo-circle.png';
+                                thumbnailFooter = '(Couldn\'t find a thumbnail for that place!)'
+                            } else if (results[0]) {
+                                thumbnailUrl = results[0].urls.regular;
+                                thumbnailFooter = 'Image by ' + results[0].user.name + ' on Unsplash';
+                            }
 
                             // Check if there are multiple date options
                             if (!interaction.options.getString('date2')) {
@@ -126,9 +137,9 @@ module.exports = {
                                     .setColor('#ff0cff')
                                     .setTitle('New trip: ' + interaction.options.getString('name'))
                                     .setDescription('React to this message to be given the associated role!')
-                                    .setThumbnail(results[0].urls.regular)
+                                    .setThumbnail(thumbnailUrl)
                                     .addField('When:', interaction.options.getString('date'), false)
-                                    .setFooter('Image by ' + results[0].user.name + ' on Unsplash');
+                                    .setFooter(thumbnailFooter);
 
                                 // Send newTripEmbed, get message ID through newTripMsg
                                 interaction.reply({ embeds: [newTripEmbed] }).then(async (newTripInteraction) => {
@@ -164,9 +175,9 @@ module.exports = {
                                             .setColor('#ff0cff')
                                             .setTitle('New trip: ' + interaction.options.getString('name'))
                                             .setDescription('React to this message to indicate which day(s) you can go!')
-                                            .setThumbnail(results[0].urls.regular)
+                                            .setThumbnail(thumbnailUrl)
                                             .addField('When:', `:one: ${interaction.options.getString('date')}\n:two: ${interaction.options.getString('date2')}\n:three: ${interaction.options.getString('date3')}\n:four: ${interaction.options.getString('date4')}`, false)
-                                            .setFooter('Image by ' + results[0].user.name + ' on Unsplash');
+                                            .setFooter(thumbnailFooter);
 
                                         // Send newTripEmbed, get message ID through newTripMsg
                                         interaction.reply({ embeds: [newTripEmbed] }).then(async (newTripInteraction) => {
@@ -202,9 +213,9 @@ module.exports = {
                                             .setColor('#ff0cff')
                                             .setTitle('New trip: ' + interaction.options.getString('name'))
                                             .setDescription('React to this message to indicate which day(s) you can go!')
-                                            .setThumbnail(results[0].urls.regular)
+                                            .setThumbnail(thumbnailUrl)
                                             .addField('When:', `:one: ${interaction.options.getString('date')}\n:two: ${interaction.options.getString('date2')}\n:three: ${interaction.options.getString('date3')}`, false)
-                                            .setFooter('Image by ' + results[0].user.name + ' on Unsplash');
+                                            .setFooter(thumbnailFooter);
 
                                         // Send newTripEmbed, get message ID through newTripMsg
                                         interaction.reply({ embeds: [newTripEmbed] }).then(async (newTripInteraction) => {
@@ -242,9 +253,9 @@ module.exports = {
                                         .setColor('#ff0cff')
                                         .setTitle('New trip: ' + interaction.options.getString('name'))
                                         .setDescription('React to this message to indicate which day(s) you can go!')
-                                        .setThumbnail(results[0].urls.regular)
+                                        .setThumbnail(thumbnailUrl)
                                         .addField('When:', `:one: ${interaction.options.getString('date')}\n:two: ${interaction.options.getString('date2')}`, false)
-                                        .setFooter('Image by ' + results[0].user.name + ' on Unsplash');
+                                        .setFooter(thumbnailFooter);
 
                                     // Send newTripEmbed, get message ID through newTripMsg
                                     interaction.reply({ embeds: [newTripEmbed] }).then(async (newTripInteraction) => {
