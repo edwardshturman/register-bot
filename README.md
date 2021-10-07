@@ -72,7 +72,7 @@ For any issues you encounter, feel free to [submit an issue](https://github.com/
 
 👋 Hi there! I'm Edward, and I'm a Computer Science Major at the University of San Francisco. 💻
 
-Register is a Discord bot I made for my group of friends — after our high school graduation in May 2021, we wanted to make the most of our Summer together, and we needed a tool to make planning events, documenting availability, and tracking planning progress more convenient.
+Register is a Discord bot I made for my group of friends — after our high school graduation in May 2021, we wanted to make the most of our Summer together, and we needed a tool to make planning trips, documenting availability, and tracking planning progress more convenient.
 
 Well, here it is! I hope you enjoy, and I'll be updating it regularly for now. Go on and plan some epic events!
 
