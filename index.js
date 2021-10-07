@@ -29,7 +29,7 @@ for (const file of commandFiles) {
 // Log launch, set status
 client.once('ready', () => {
     console.log('Register is online!');
-    client.user.setActivity('VALORANT', { type: 'PLAYING' });
+    client.user.setActivity('/event | v0.5.0', { type: 'LISTENING' });
 });
 
 // Listens for new servers, might do something with this later
