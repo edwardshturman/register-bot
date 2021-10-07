@@ -72,16 +72,16 @@ client.on('messageReactionAdd', async (reaction, user) => {
         }
     }
 
-    // Check to see if a reaction is on a trip message; if it is, add the trip role to the user reacting
-    const Trip = require('./config/trip-schema');
-    Trip.findOne({ tripMessageId: reaction.message.id }).then((currentTrip) => {
-        if (currentTrip) {
-            if (reaction.emoji.name === currentTrip.tripEmoji) {
+    // Check to see if a reaction is on an event message; if it is, add the event role to the user reacting
+    const Event = require('./config/event-schema');
+    Event.findOne({ eventMessageId: reaction.message.id }).then((currentEvent) => {
+        if (currentEvent) {
+            if (reaction.emoji.name === currentEvent.eventEmoji) {
                 reaction.message.guild.members.fetch(user.id).then(member => {
 
-                    // Ignore trip message reactions if by a bot
+                    // Ignore event message reactions if by a bot
                     if (!member.user.bot) {
-                        member.roles.add(currentTrip.tripRoleId);
+                        member.roles.add(currentEvent.eventRoleId);
                     }
                 });
             }
@@ -103,13 +103,13 @@ client.on('messageReactionRemove', async (reaction, user) => {
         }
     }
 
-    // Check to see if a reaction is on a trip message; if it is, remove the trip role from the user reacting
-    const Trip = require('./config/trip-schema');
-    Trip.findOne({ tripMessageId: reaction.message.id }).then((currentTrip) => {
-        if (currentTrip) {
-            if (reaction.emoji.name === currentTrip.tripEmoji) {
+    // Check to see if a reaction is on an event message; if it is, remove the event role from the user reacting
+    const Event = require('./config/event-schema');
+    Event.findOne({ eventMessageId: reaction.message.id }).then((currentEvent) => {
+        if (currentEvent) {
+            if (reaction.emoji.name === currentEvent.eventEmoji) {
                 reaction.message.guild.members.fetch(user.id).then(member => {
-                    member.roles.remove(currentTrip.tripRoleId);
+                    member.roles.remove(currentEvent.eventRoleId);
                 });
             }
         }
