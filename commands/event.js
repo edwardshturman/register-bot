@@ -84,9 +84,9 @@ module.exports = {
                 .setColor('#ff0cff')
                 .setTitle('Event command')
                 .setDescription('Used to create new events and roles we can track/mention')
-                .addField('add', '`/event add [name of event] [event emoji] [event date] [optional: another potential event date] ...` *(up to four potential dates)*', false)
-                .addField('reschedule', '`/event reschedule [event emoji] [date]`', false)
-                .addField('cancel', '`/event cancel [event emoji]`', false);
+                .addField('add', '\`/event add [name of event] [event emoji] [event date] [optional: another potential event date] ...\` *(up to four potential dates)*', false)
+                .addField('reschedule', '\`/event reschedule [event emoji] [date]\`', false)
+                .addField('cancel', '\`/event cancel [event emoji]\`', false);
             await interaction.reply({ embeds: [eventHelpEmbed] });
 
         // Execute /event add
