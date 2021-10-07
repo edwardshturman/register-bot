@@ -22,10 +22,20 @@ const rest = new REST({ version: '9' }).setToken(process.env.TOKEN);
     try {
         console.log('Started refreshing application (/) commands.');
 
-        await rest.put(
-            Routes.applicationGuildCommands(process.env.CLIENTID, process.env.GUILDID),
-            { body: commands }
-        );
+        // Production environment, deploy commands globally
+        if (process.env.ENV === 'PROD') {
+            await rest.put(
+                Routes.applicationCommands(process.env.CLIENTID),
+                { body: commands }
+            );
+
+        // Development environment, deploy commands to test server
+        } else if (process.env.ENV === 'DEV') {
+            await rest.put(
+                Routes.applicationGuildCommands(process.env.CLIENTID, process.env.GUILDID),
+                { body: commands }
+            );
+        }
 
         console.log('Successfully reloaded application (/) commands.');
     } catch (error) {
