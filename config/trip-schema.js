@@ -7,7 +7,7 @@ const tripSchema = new Schema({
     tripEmoji: String,
     tripMessageId: String,
     tripRoleId: String
-});
+}, { collection: guildId });
 
 const Trip = mongoose.model('trip', tripSchema);
 

@@ -3,7 +3,6 @@ require('discord.js');
 require('dotenv').config();
 const fs = require('fs');
 const mongoose = require('mongoose');
-const Trip = require('./config/trip-schema');
 
 // Connect to MongoDB
 mongoose.connect(process.env.DBCONNECTION, () => {
@@ -31,6 +30,11 @@ for (const file of commandFiles) {
 client.once('ready', () => {
     console.log('Register is online!');
     client.user.setActivity('VALORANT', { type: 'PLAYING' });
+});
+
+// Listens for new servers, might do something with this later
+client.on('guildCreate', (guild) => {
+   console.log(`Joined a new server: ${guild.id}`);
 });
 
 // Interaction listener for slash commands
@@ -69,6 +73,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
     }
 
     // Check to see if a reaction is on a trip message; if it is, add the trip role to the user reacting
+    const Trip = require('./config/trip-schema');
     Trip.findOne({ tripMessageId: reaction.message.id }).then((currentTrip) => {
         if (currentTrip) {
             if (reaction.emoji.name === currentTrip.tripEmoji) {
@@ -99,6 +104,7 @@ client.on('messageReactionRemove', async (reaction, user) => {
     }
 
     // Check to see if a reaction is on a trip message; if it is, remove the trip role from the user reacting
+    const Trip = require('./config/trip-schema');
     Trip.findOne({ tripMessageId: reaction.message.id }).then((currentTrip) => {
         if (currentTrip) {
             if (reaction.emoji.name === currentTrip.tripEmoji) {
