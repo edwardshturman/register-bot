@@ -1,6 +1,6 @@
 # Register
 
-🌟 A high-quality, open-source event planning Discord bot. 🗓
+🌟 A high-quality, open-source Discord bot for event planning. 🗓
 
 [![Dependency status](https://david-dm.org/edwardshturman/register-bot.svg)](https://david-dm.org/edwardshturman/register-bot)
 [![GitHub last commit](https://img.shields.io/github/last-commit/edwardshturman/register-bot)](https://github.com/edwardshturman/register-bot/commits/master)

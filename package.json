@@ -3,9 +3,9 @@
   "author": "Edward Shturman",
   "bugs": "https://github.com/edwardshturman/register-bot/issues",
   "homepage": "https://github.com/edwardshturman/register-bot",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "license": "UNLICENSED",
-  "description": "Multifunctional Discord bot for trip planning",
+  "description": "A high-quality, open-source Discord bot for event planning",
   "repository": {
     "type": "git",
     "url": "https://github.com/edwardshturman/register-bot.git"
