@@ -91,6 +91,10 @@ module.exports = {
 
         // Execute /trip add
         } else if (interaction.options.getSubcommand() === 'add') {
+
+            // Make the server ID accessible by the trip schema
+            global.guildId = interaction.guildId;
+
             // Dependencies
             const Discord = require('discord.js');
             require('mongoose');
@@ -292,6 +296,10 @@ module.exports = {
 
         // Execute /trip reschedule
         } else if (interaction.options.getSubcommand() === 'reschedule') {
+
+            // Make the server ID accessible by the trip schema
+            global.guildId = interaction.guildId;
+
             // Dependencies
             const Discord = require('discord.js');
             require('mongoose');
@@ -340,6 +348,10 @@ module.exports = {
 
         // Execute /trip cancel
         } else if (interaction.options.getSubcommand() === 'cancel') {
+
+            // Make the server ID accessible by the trip schema
+            global.guildId = interaction.guildId;
+
             // Dependencies
             const Discord = require('discord.js');
             require('mongoose');
