@@ -11,6 +11,10 @@
 
 ---
 
+## Invite Link
+
+→ [Add me](https://discord.com/api/oauth2/authorize?client_id=856081409742864384&permissions=0&scope=bot%20applications.commands) to your server!
+
 ## Features
 
 - Plan events with a simple slash command: `/event add <where> <unique emoji> <when>` 🗓
@@ -58,7 +62,7 @@ For upcoming features, check out the [Issues](https://github.com/edwardshturman/
 
 ## Support
 
-For any issues you encounter, feel free to [submit an issue](https://github.com/edwardshturman/register-bot/issues).
+For help with the event command, use `/event help`. For any issues you encounter, feel free to [submit an issue](https://github.com/edwardshturman/register-bot/issues).
 
 ## Tech Stack
 
