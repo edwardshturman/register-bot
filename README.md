@@ -72,6 +72,12 @@ For help with the event command, use `/event help`. For any issues you encounter
 - **Heroku**: deployment
 - **Google Calendar API**: *coming soon!*
 
+## Contributions
+
+This is primarily a personal project for me and my friends, which I decided to share here publicly. For the time being, I don't have an open-source license set for Register, and as such, must politely decline contributions.
+
+Feel free to look around, but please refrain from copying, modifying, or distributing Register source code without my explicit permission. Thank you!
+
 # 🚀 About Me
 
 👋 Hi there! I'm Edward, and I'm a Computer Science Major at the University of San Francisco. 💻
