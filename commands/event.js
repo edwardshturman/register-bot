@@ -91,7 +91,6 @@ module.exports = {
 
         // Execute /event add
         } else if (interaction.options.getSubcommand() === 'add') {
-
             // Make the server ID accessible by the event schema
             global.guildId = interaction.guildId;
 
@@ -127,7 +126,7 @@ module.exports = {
                             // If image search doesn't return any results, set embed thumbnail to Register logo
                             if (!results[0]) {
                                 thumbnailUrl = 'https://raw.githubusercontent.com/edwardshturman/register-bot/master/assets/register-logo-circle.png';
-                                thumbnailFooter = '(Couldn\'t find a thumbnail for that place!)'
+                                thumbnailFooter = '(Couldn\'t find a thumbnail for that place!)';
                             } else if (results[0]) {
                                 thumbnailUrl = results[0].urls.regular;
                                 thumbnailFooter = 'Image by ' + results[0].user.name + ' on Unsplash';
@@ -167,11 +166,8 @@ module.exports = {
                                             });
                                         });
                                 });
-
                             } else if (interaction.options.getString('date2')) {
-
                                 if (interaction.options.getString('date3')) {
-
                                     if (interaction.options.getString('date4')) {
 
                                         // Four options for event date exist; create newEventEmbed using event name and Unsplash thumbnail with author info
@@ -208,8 +204,6 @@ module.exports = {
                                                     });
                                                 });
                                         });
-
-
                                     } else if (!interaction.options.getString('date4')) {
 
                                         // Three options for event date exist; create newEventEmbed using event name and Unsplash thumbnail with author info
@@ -245,13 +239,9 @@ module.exports = {
                                                     });
                                                 });
                                         });
-
                                     }
-
-                                }
-
-                                else if (!interaction.options.getString('date3')) {
-
+                                } else if (!interaction.options.getString('date3')) {
+                                    
                                     // Two options for event date exist; create newEventEmbed using event name and Unsplash thumbnail with author info
                                     const newEventEmbed = new Discord.MessageEmbed()
                                         .setColor('#ff0cff')
@@ -284,11 +274,8 @@ module.exports = {
                                                 });
                                             });
                                     });
-
                                 }
-
                             }
-
                         }
                     });
                 }
@@ -318,7 +305,6 @@ module.exports = {
 
                         // Search for newEventEmbed message in channel where /event reschedule command is used
                         await interaction.channel.messages.fetch(currentEvent.eventMessageId).then((currentEventMsg) => {
-
                             if (!currentEventMsg) {
                                 interaction.reply('Couldn\'t find that event! Try searching in the channel where it was created.');
                             } else if (currentEventMsg) {
@@ -341,10 +327,9 @@ module.exports = {
                         });
 
                         await interaction.reply('Event rescheduled! Check the original message for the new details.');
-
                     });
-
-            }});
+                }
+            });
 
         // Execute /event cancel
         } else if (interaction.options.getSubcommand() === 'cancel') {
@@ -367,7 +352,6 @@ module.exports = {
 
                     // Search for newEventEmbed message in channel where /event cancel command is used
                     await interaction.channel.messages.fetch(currentEvent.eventMessageId).then((currentEventMsg) => {
-
                         if (!currentEventMsg) {
                             interaction.reply('Couldn\'t find that event! Try searching in the channel where it was created.');
                         } else if (currentEventMsg) {
@@ -391,7 +375,6 @@ module.exports = {
                     // Find event using unique emoji and delete from MongoDB
                     await Event.deleteOne({ eventEmoji: interaction.options.getString('emoji') });
                     await interaction.reply('Event canceled; the original message was edited accordingly :(');
-
                 }
             });
         }

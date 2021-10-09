@@ -34,7 +34,7 @@ client.once('ready', () => {
 
 // Listens for new servers, might do something with this later
 client.on('guildCreate', (guild) => {
-   console.log(`Joined a new server: ${guild.id}`);
+    console.log(`Joined a new server: ${guild.id}`);
 });
 
 // Interaction listener for slash commands
