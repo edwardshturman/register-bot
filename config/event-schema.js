@@ -1,3 +1,5 @@
+const eventCommand = require('../commands/event');
+
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
@@ -7,7 +9,7 @@ const eventSchema = new Schema({
     eventEmoji: String,
     eventMessageId: String,
     eventRoleId: String
-}, { collection: guildId });
+}, { collection: eventCommand.guildId });
 
 const Event = mongoose.model('event', eventSchema);
 
