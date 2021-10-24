@@ -13,7 +13,7 @@
 
 ## Invite Link
 
-→ [Add me](https://discord.com/api/oauth2/authorize?client_id=856081409742864384&permissions=0&scope=bot%20applications.commands) to your server!
+→ [Add me](https://discord.com/api/oauth2/authorize?client_id=856081409742864384&permissions=2416168000&scope=bot%20applications.commands) to your server!
 
 ## Features
 
