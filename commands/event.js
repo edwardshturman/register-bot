@@ -92,7 +92,7 @@ module.exports = {
         // Execute /event add
         } else if (interaction.options.getSubcommand() === 'add') {
             // Make the server ID accessible by the event schema
-            global.guildId = interaction.guildId;
+            module.exports.guildId = interaction.guildId;
 
             // Dependencies
             const Discord = require('discord.js');
@@ -285,7 +285,7 @@ module.exports = {
         } else if (interaction.options.getSubcommand() === 'reschedule') {
 
             // Make the server ID accessible by the event schema
-            global.guildId = interaction.guildId;
+            module.exports.guildId = interaction.guildId;
 
             // Dependencies
             const Discord = require('discord.js');
@@ -335,7 +335,7 @@ module.exports = {
         } else if (interaction.options.getSubcommand() === 'cancel') {
 
             // Make the server ID accessible by the event schema
-            global.guildId = interaction.guildId;
+            module.exports.guildId = interaction.guildId;
 
             // Dependencies
             const Discord = require('discord.js');
