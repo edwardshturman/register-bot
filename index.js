@@ -55,6 +55,15 @@ client.on('interactionCreate', async interaction => {
     }
 });
 
+// Reply to being pinged with GIF
+client.on("messageCreate", (message) => {
+    if (message.author.bot) return;
+    if (message.content.includes("@here") || message.content.includes("@everyone") || message.type === "REPLY") return;
+    if (message.mentions.has(client.user.id)) {
+        message.channel.send("https://c.tenor.com/Jf-_xbLhAEYAAAAC/discord-valorant.gif");
+    }
+});
+
 // ****************************** REACTION LISTENERS ******************************
 
 // Message reaction listener
