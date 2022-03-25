@@ -29,7 +29,7 @@ for (const file of commandFiles) {
 // Log launch, set status
 client.once('ready', () => {
     console.log('Register is online!');
-    client.user.setActivity('/event | v0.5.1', { type: 'LISTENING' });
+    client.user.setActivity('/event | v0.6.0', { type: 'LISTENING' });
 });
 
 // Listens for new servers, might do something with this later
@@ -52,6 +52,15 @@ client.on('interactionCreate', async interaction => {
             content: 'There was an error while executing this command!',
             ephemeral: true
         });
+    }
+});
+
+// Reply to being pinged with GIF
+client.on("messageCreate", (message) => {
+    if (message.author.bot) return;
+    if (message.content.includes("@here") || message.content.includes("@everyone") || message.type === "REPLY") return;
+    if (message.mentions.has(client.user.id)) {
+        message.channel.send("https://c.tenor.com/Jf-_xbLhAEYAAAAC/discord-valorant.gif");
     }
 });
 

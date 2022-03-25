@@ -47,9 +47,25 @@ module.exports = {
                         .setDescription('Another potential date for the event')
                         .setRequired(false)))
 
+        // Rename subcommand
+        .addSubcommand(renameSubcommand =>
+            renameSubcommand
+                .setName('rename')
+                .setDescription('Rename an event')
+                .addStringOption(eventEmoji =>
+                    eventEmoji
+                        .setName('emoji')
+                        .setDescription('The unique emoji for the event')
+                        .setRequired(true))
+                .addStringOption(eventName =>
+                    eventName
+                        .setName('name')
+                        .setDescription('The new name for the event')
+                        .setRequired(true)))
+
         // Reschedule subcommand
-        .addSubcommand(resceduleSubcommand =>
-            resceduleSubcommand
+        .addSubcommand(rescheduleSubcommand =>
+            rescheduleSubcommand
                 .setName('reschedule')
                 .setDescription('Reschedule an event')
                 .addStringOption(eventEmoji =>
@@ -277,6 +293,55 @@ module.exports = {
                                 }
                             }
                         }
+                    });
+                }
+            });
+
+        // Execute /event rename
+        } else if (interaction.options.getSubcommand() === 'rename') {
+
+            // Make the server ID accessible by the event schema
+            module.exports.guildId = interaction.guildId;
+
+            // Dependencies
+            const Discord = require('discord.js');
+            require('mongoose');
+            const Event = require('../config/event-schema');
+
+            // Using unique event emoji, find event and pass currentEvent to use for editing original newEventEmbed
+            await Event.findOne({ eventEmoji: interaction.options.getString('emoji') }).then(async (currentEvent) => {
+
+                // Check if event exists using unique emoji, ignore if it doesn't
+                if (!currentEvent) {
+                    await interaction.reply('Couldn\'t find that event! Try a different emoji.');
+                } else if (currentEvent) {
+
+                    // Using unique event emoji, find event and change name
+                    await Event.updateOne({ eventEmoji: interaction.options.getString('emoji') }, { eventName: interaction.options.getString('name') }).then(async () => {
+
+                        // Search for newEventEmbed message in channel where /event rename command is used
+                        await interaction.channel.messages.fetch(currentEvent.eventMessageId).then((currentEventMsg) => {
+                            if (!currentEventMsg) {
+                                interaction.reply('Couldn\'t find that event! Try searching in the channel where it was created.');
+                            } else if (currentEventMsg) {
+
+                                // Edit original newEventEmbed
+                                const newEventEmbed = new Discord.MessageEmbed()
+                                    .setColor('#ff0cff')
+                                    .setTitle('New event: ' + interaction.options.getString('name'))
+                                    .setDescription('React to this message to be given the associated role!')
+                                    .setThumbnail(currentEventMsg.embeds[0].thumbnail.url)
+                                    .addField('When:', currentEvent.eventDate, false)
+                                    .setFooter(currentEventMsg.embeds[0].footer.text);
+                                currentEventMsg.edit({ embeds: [newEventEmbed] });
+                            }
+                        });
+
+                        // Edit role name
+                        interaction.guild.roles.fetch(currentEvent.eventRoleId).then(eventRole => {
+                            eventRole.edit({ name: interaction.options.getString('name') + ' ' + currentEvent.eventEmoji });
+                        });
+                        await interaction.reply('Event renamed! Check the original message for the new details.');
                     });
                 }
             });
