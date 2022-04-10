@@ -148,8 +148,25 @@ module.exports = {
                                 thumbnailFooter = 'Image by ' + results[0].user.name + ' on Unsplash';
                             }
 
-                            // Check if there are multiple date options
-                            if (!interaction.options.getString('date2')) {
+                            // For each date, add to the dates array to be used as a new field in the embed
+                            const dates = [];
+                            let multiple = false;
+                            dates.push(interaction.options.getString('date'));
+                            if (interaction.options.getString('date2')) {
+                                multiple = true;
+                                dates.push(interaction.options.getString('date2'));
+                            }
+                            if (interaction.options.getString('date3')) {
+                                multiple = true;
+                                dates.push(interaction.options.getString('date3'));
+                            }
+                            if (interaction.options.getString('date4')) {
+                                multiple = true
+                                dates.push(interaction.options.getString('date4'));
+                            }
+
+                            // Only one date specified
+                            if (!multiple) {
 
                                 // Create newEventEmbed using event name, date, and Unsplash thumbnail with author info
                                 const newEventEmbed = new Discord.MessageEmbed()
@@ -182,90 +199,21 @@ module.exports = {
                                             });
                                         });
                                 });
-                            } else if (interaction.options.getString('date2')) {
-                                if (interaction.options.getString('date3')) {
-                                    if (interaction.options.getString('date4')) {
+                            } else if (multiple) {
 
-                                        // Four options for event date exist; create newEventEmbed using event name and Unsplash thumbnail with author info
-                                        const newEventEmbed = new Discord.MessageEmbed()
-                                            .setColor('#ff0cff')
-                                            .setTitle('New event: ' + interaction.options.getString('name'))
-                                            .setDescription('React to this message to indicate which day(s) you can go!')
-                                            .setThumbnail(thumbnailUrl)
-                                            .addField('When:', `:one: ${interaction.options.getString('date')}\n:two: ${interaction.options.getString('date2')}\n:three: ${interaction.options.getString('date3')}\n:four: ${interaction.options.getString('date4')}`, false)
-                                            .setFooter(thumbnailFooter);
-
-                                        // Send newEventEmbed, get message ID through newEventMsg
-                                        interaction.reply({ embeds: [newEventEmbed] }).then(async (newEventInteraction) => {
-                                            const newEventMsg = await interaction.fetchReply();
-
-                                            // Create a role for the event using the event name and unique emoji
-                                            interaction.guild.roles.create({ name: interaction.options.getString('name') + ' ' + interaction.options.getString('emoji') })
-                                                .then((newEventRole) => {
-
-                                                    // Create an event in MongoDB using the event name, date, unique emoji, newEventEmbed message ID, and the event role ID
-                                                    new Event({
-                                                        eventName: interaction.options.getString('name'),
-                                                        eventDate: 'TBD',
-                                                        eventEmoji: interaction.options.getString('emoji'),
-                                                        eventMessageId: newEventMsg.id,
-                                                        eventRoleId: newEventRole.id
-                                                    }).save().then((newEvent) => {
-
-                                                        // React to the newEventEmbed with the event date options
-                                                        newEventMsg.react('1️⃣');
-                                                        newEventMsg.react('2️⃣');
-                                                        newEventMsg.react('3️⃣');
-                                                        newEventMsg.react('4️⃣');
-                                                    });
-                                                });
-                                        });
-                                    } else if (!interaction.options.getString('date4')) {
-
-                                        // Three options for event date exist; create newEventEmbed using event name and Unsplash thumbnail with author info
-                                        const newEventEmbed = new Discord.MessageEmbed()
-                                            .setColor('#ff0cff')
-                                            .setTitle('New event: ' + interaction.options.getString('name'))
-                                            .setDescription('React to this message to indicate which day(s) you can go!')
-                                            .setThumbnail(thumbnailUrl)
-                                            .addField('When:', `:one: ${interaction.options.getString('date')}\n:two: ${interaction.options.getString('date2')}\n:three: ${interaction.options.getString('date3')}`, false)
-                                            .setFooter(thumbnailFooter);
-
-                                        // Send newEventEmbed, get message ID through newEventMsg
-                                        interaction.reply({ embeds: [newEventEmbed] }).then(async (newEventInteraction) => {
-                                            const newEventMsg = await interaction.fetchReply();
-
-                                            // Create a role for the event using the event name and unique emoji
-                                            interaction.guild.roles.create({ name: interaction.options.getString('name') + ' ' + interaction.options.getString('emoji') })
-                                                .then((newEventRole) => {
-
-                                                    // Create an event in MongoDB using the event name, date, unique emoji, newEventEmbed message ID, and the event role ID
-                                                    new Event({
-                                                        eventName: interaction.options.getString('name'),
-                                                        eventDate: 'TBD',
-                                                        eventEmoji: interaction.options.getString('emoji'),
-                                                        eventMessageId: newEventMsg.id,
-                                                        eventRoleId: newEventRole.id
-                                                    }).save().then((newEvent) => {
-
-                                                        // React to the newEventEmbed with the event date options
-                                                        newEventMsg.react('1️⃣');
-                                                        newEventMsg.react('2️⃣');
-                                                        newEventMsg.react('3️⃣');
-                                                    });
-                                                });
-                                        });
-                                    }
-                                } else if (!interaction.options.getString('date3')) {
-                                    
-                                    // Two options for event date exist; create newEventEmbed using event name and Unsplash thumbnail with author info
+                                    // Multiple options for event date exist; create newEventEmbed using event name and Unsplash thumbnail with author info
                                     const newEventEmbed = new Discord.MessageEmbed()
                                         .setColor('#ff0cff')
                                         .setTitle('New event: ' + interaction.options.getString('name'))
                                         .setDescription('React to this message to indicate which day(s) you can go!')
                                         .setThumbnail(thumbnailUrl)
-                                        .addField('When:', `:one: ${interaction.options.getString('date')}\n:two: ${interaction.options.getString('date2')}`, false)
                                         .setFooter(thumbnailFooter);
+
+                                    let counter = 0;
+                                    dates.forEach(date => {
+                                        counter++;
+                                        newEventEmbed.addField('Potential date ' + counter + ":", date, true);
+                                    });
 
                                     // Send newEventEmbed, get message ID through newEventMsg
                                     interaction.reply({ embeds: [newEventEmbed] }).then(async (newEventInteraction) => {
@@ -287,10 +235,11 @@ module.exports = {
                                                     // React to the newEventEmbed with the event date options
                                                     newEventMsg.react('1️⃣');
                                                     newEventMsg.react('2️⃣');
+                                                    if (counter >= 3) newEventMsg.react('3️⃣');
+                                                    if (counter === 4) newEventMsg.react('4️⃣');
                                                 });
                                             });
                                     });
-                                }
                             }
                         }
                     });
