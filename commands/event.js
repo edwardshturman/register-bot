@@ -161,7 +161,7 @@ module.exports = {
                                 dates.push(interaction.options.getString('date3'));
                             }
                             if (interaction.options.getString('date4')) {
-                                multiple = true
+                                multiple = true;
                                 dates.push(interaction.options.getString('date4'));
                             }
 
@@ -201,45 +201,45 @@ module.exports = {
                                 });
                             } else if (multiple) {
 
-                                    // Multiple options for event date exist; create newEventEmbed using event name and Unsplash thumbnail with author info
-                                    const newEventEmbed = new Discord.MessageEmbed()
-                                        .setColor('#ff0cff')
-                                        .setTitle('New event: ' + interaction.options.getString('name'))
-                                        .setDescription('React to this message to indicate which day(s) you can go!')
-                                        .setThumbnail(thumbnailUrl)
-                                        .setFooter(thumbnailFooter);
+                                // Multiple options for event date exist; create newEventEmbed using event name and Unsplash thumbnail with author info
+                                const newEventEmbed = new Discord.MessageEmbed()
+                                    .setColor('#ff0cff')
+                                    .setTitle('New event: ' + interaction.options.getString('name'))
+                                    .setDescription('React to this message to indicate which day(s) you can go!')
+                                    .setThumbnail(thumbnailUrl)
+                                    .setFooter(thumbnailFooter);
 
-                                    let counter = 0;
-                                    dates.forEach(date => {
-                                        counter++;
-                                        newEventEmbed.addField('Potential date ' + counter + ":", date, true);
-                                    });
+                                let counter = 0;
+                                dates.forEach(date => {
+                                    counter++;
+                                    newEventEmbed.addField('Potential date ' + counter + ':', date, true);
+                                });
 
-                                    // Send newEventEmbed, get message ID through newEventMsg
-                                    interaction.reply({ embeds: [newEventEmbed] }).then(async (newEventInteraction) => {
-                                        const newEventMsg = await interaction.fetchReply();
+                                // Send newEventEmbed, get message ID through newEventMsg
+                                interaction.reply({ embeds: [newEventEmbed] }).then(async (newEventInteraction) => {
+                                    const newEventMsg = await interaction.fetchReply();
 
-                                        // Create a role for the event using the event name and unique emoji
-                                        interaction.guild.roles.create({ name: interaction.options.getString('name') + ' ' + interaction.options.getString('emoji') })
-                                            .then((newEventRole) => {
+                                    // Create a role for the event using the event name and unique emoji
+                                    interaction.guild.roles.create({ name: interaction.options.getString('name') + ' ' + interaction.options.getString('emoji') })
+                                        .then((newEventRole) => {
 
-                                                // Create an event in MongoDB using the event name, date, unique emoji, newEventEmbed message ID, and the event role ID
-                                                new Event({
-                                                    eventName: interaction.options.getString('name'),
-                                                    eventDate: 'TBD',
-                                                    eventEmoji: interaction.options.getString('emoji'),
-                                                    eventMessageId: newEventMsg.id,
-                                                    eventRoleId: newEventRole.id
-                                                }).save().then((newEvent) => {
+                                            // Create an event in MongoDB using the event name, date, unique emoji, newEventEmbed message ID, and the event role ID
+                                            new Event({
+                                                eventName: interaction.options.getString('name'),
+                                                eventDate: 'TBD',
+                                                eventEmoji: interaction.options.getString('emoji'),
+                                                eventMessageId: newEventMsg.id,
+                                                eventRoleId: newEventRole.id
+                                            }).save().then((newEvent) => {
 
-                                                    // React to the newEventEmbed with the event date options
-                                                    newEventMsg.react('1️⃣');
-                                                    newEventMsg.react('2️⃣');
-                                                    if (counter >= 3) newEventMsg.react('3️⃣');
-                                                    if (counter === 4) newEventMsg.react('4️⃣');
-                                                });
+                                                // React to the newEventEmbed with the event date options
+                                                newEventMsg.react('1️⃣');
+                                                newEventMsg.react('2️⃣');
+                                                if (counter >= 3) newEventMsg.react('3️⃣');
+                                                if (counter === 4) newEventMsg.react('4️⃣');
                                             });
-                                    });
+                                        });
+                                });
                             }
                         }
                     });
