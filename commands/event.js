@@ -107,8 +107,6 @@ module.exports = {
 
         // Execute /event add
         } else if (interaction.options.getSubcommand() === 'add') {
-            // Make the server ID accessible by the event schema
-            module.exports.guildId = interaction.guildId;
 
             // Dependencies
             const Discord = require('discord.js');
@@ -118,7 +116,7 @@ module.exports = {
             const unsplash = require('unsplash-js').createApi({ accessKey: process.env.UNSPLASH_ACCESS_KEY });
 
             // Search for an existing event emoji and return if it exists
-            Event.findOne({ eventEmoji: interaction.options.getString('emoji') }).then((eventExists) => {
+            Event.findOne({ guildId: interaction.guildId, eventEmoji: interaction.options.getString('emoji') }).then((eventExists) => {
                 if (eventExists) {
                     interaction.reply('This event already exists! Try a different emoji.');
                 } else if (!eventExists) {
@@ -187,6 +185,7 @@ module.exports = {
 
                                             // Create an event in MongoDB using the event name, date, unique emoji, newEventEmbed message ID, and the event role ID
                                             new Event({
+                                                guildId: interaction.guildId,
                                                 eventName: interaction.options.getString('name'),
                                                 eventDate: interaction.options.getString('date'),
                                                 eventEmoji: interaction.options.getString('emoji'),
@@ -225,6 +224,7 @@ module.exports = {
 
                                             // Create an event in MongoDB using the event name, date, unique emoji, newEventEmbed message ID, and the event role ID
                                             new Event({
+                                                guildId: interaction.guildId,
                                                 eventName: interaction.options.getString('name'),
                                                 eventDate: 'TBD',
                                                 eventEmoji: interaction.options.getString('emoji'),
@@ -249,16 +249,13 @@ module.exports = {
         // Execute /event rename
         } else if (interaction.options.getSubcommand() === 'rename') {
 
-            // Make the server ID accessible by the event schema
-            module.exports.guildId = interaction.guildId;
-
             // Dependencies
             const Discord = require('discord.js');
             require('mongoose');
             const Event = require('../config/event-schema');
 
             // Using unique event emoji, find event and pass currentEvent to use for editing original newEventEmbed
-            await Event.findOne({ eventEmoji: interaction.options.getString('emoji') }).then(async (currentEvent) => {
+            await Event.findOne({ guildId: interaction.guildId, eventEmoji: interaction.options.getString('emoji') }).then(async (currentEvent) => {
 
                 // Check if event exists using unique emoji, ignore if it doesn't
                 if (!currentEvent) {
@@ -266,7 +263,7 @@ module.exports = {
                 } else if (currentEvent) {
 
                     // Using unique event emoji, find event and change name
-                    await Event.updateOne({ eventEmoji: interaction.options.getString('emoji') }, { eventName: interaction.options.getString('name') }).then(async () => {
+                    await Event.updateOne({ guildId: interaction.guildId, eventEmoji: interaction.options.getString('emoji') }, { eventName: interaction.options.getString('name') }).then(async () => {
 
                         // Search for newEventEmbed message in channel where /event rename command is used
                         await interaction.channel.messages.fetch(currentEvent.eventMessageId).then((currentEventMsg) => {
@@ -298,16 +295,13 @@ module.exports = {
         // Execute /event reschedule
         } else if (interaction.options.getSubcommand() === 'reschedule') {
 
-            // Make the server ID accessible by the event schema
-            module.exports.guildId = interaction.guildId;
-
             // Dependencies
             const Discord = require('discord.js');
             require('mongoose');
             const Event = require('../config/event-schema');
 
             // Using unique event emoji, find event and pass currentEvent to use for editing original newEventEmbed
-            await Event.findOne({ eventEmoji: interaction.options.getString('emoji') }).then(async (currentEvent) => {
+            await Event.findOne({ guildId: interaction.guildId, eventEmoji: interaction.options.getString('emoji') }).then(async (currentEvent) => {
 
                 // Check if event exists using unique emoji, ignore if it doesn't
                 if (!currentEvent) {
@@ -315,7 +309,7 @@ module.exports = {
                 } else if (currentEvent) {
 
                     // Using unique event emoji, find event and change date
-                    await Event.updateOne({ eventEmoji: interaction.options.getString('emoji') }, { eventDate: interaction.options.getString('date') }).then(async () => {
+                    await Event.updateOne({ guildId: interaction.guildId, eventEmoji: interaction.options.getString('emoji') }, { eventDate: interaction.options.getString('date') }).then(async () => {
 
                         // Search for newEventEmbed message in channel where /event reschedule command is used
                         await interaction.channel.messages.fetch(currentEvent.eventMessageId).then((currentEventMsg) => {
@@ -348,16 +342,13 @@ module.exports = {
         // Execute /event cancel
         } else if (interaction.options.getSubcommand() === 'cancel') {
 
-            // Make the server ID accessible by the event schema
-            module.exports.guildId = interaction.guildId;
-
             // Dependencies
             const Discord = require('discord.js');
             require('mongoose');
             const Event = require('../config/event-schema');
 
             // Using unique event emoji, find event and pass currentEvent to use for editing original newEventEmbed
-            await Event.findOne({ eventEmoji: interaction.options.getString('emoji') }).then(async (currentEvent) => {
+            await Event.findOne({ guildId: interaction.guildId, eventEmoji: interaction.options.getString('emoji') }).then(async (currentEvent) => {
 
                 // Check if event exists using unique emoji, ignore if it doesn't
                 if (!currentEvent) {
@@ -387,7 +378,7 @@ module.exports = {
                     await interaction.guild.roles.cache.get(currentEvent.eventRoleId).delete();
 
                     // Find event using unique emoji and delete from MongoDB
-                    await Event.deleteOne({ eventEmoji: interaction.options.getString('emoji') });
+                    await Event.deleteOne({ guildId: interaction.guildId, eventEmoji: interaction.options.getString('emoji') });
                     await interaction.reply('Event canceled; the original message was edited accordingly :(');
                 }
             });
