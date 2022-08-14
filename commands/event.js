@@ -107,8 +107,6 @@ module.exports = {
 
         // Execute /event add
         } else if (interaction.options.getSubcommand() === 'add') {
-            // Make the server ID accessible by the event schema
-            module.exports.guildId = interaction.guildId;
 
             // Dependencies
             const Discord = require('discord.js');
@@ -118,9 +116,9 @@ module.exports = {
             const unsplash = require('unsplash-js').createApi({ accessKey: process.env.UNSPLASH_ACCESS_KEY });
 
             // Search for an existing event emoji and return if it exists
-            Event.findOne({ eventEmoji: interaction.options.getString('emoji') }).then((eventExists) => {
+            Event.findOne({ guildId: interaction.guildId, eventEmoji: interaction.options.getString('emoji') }).then((eventExists) => {
                 if (eventExists) {
-                    interaction.reply('This event already exists! Try a different emoji.');
+                    interaction.reply({ content: 'This event already exists! Try a different emoji.', ephemeral: true });
                 } else if (!eventExists) {
 
                     // Fetch thumbnail from Unsplash
@@ -133,7 +131,7 @@ module.exports = {
                         let thumbnailUrl;
                         let thumbnailFooter;
                         if (result.errors) {
-                            interaction.reply('Encountered an error fetching a thumbnail (check bot console)! To avoid confusion, event was not created in database.');
+                            interaction.reply({ content: 'Encountered an error fetching a thumbnail (check bot console)! To avoid confusion, event was not created in database.', ephemeral: true });
                             console.log(result.errors[0]);
                         } else {
                             const feed = result.response;
@@ -148,8 +146,25 @@ module.exports = {
                                 thumbnailFooter = 'Image by ' + results[0].user.name + ' on Unsplash';
                             }
 
-                            // Check if there are multiple date options
-                            if (!interaction.options.getString('date2')) {
+                            // For each date, add to the dates array to be used as a new field in the embed
+                            const dates = [];
+                            let multiple = false;
+                            dates.push(interaction.options.getString('date'));
+                            if (interaction.options.getString('date2')) {
+                                multiple = true;
+                                dates.push(interaction.options.getString('date2'));
+                            }
+                            if (interaction.options.getString('date3')) {
+                                multiple = true;
+                                dates.push(interaction.options.getString('date3'));
+                            }
+                            if (interaction.options.getString('date4')) {
+                                multiple = true;
+                                dates.push(interaction.options.getString('date4'));
+                            }
+
+                            // Only one date specified
+                            if (!multiple) {
 
                                 // Create newEventEmbed using event name, date, and Unsplash thumbnail with author info
                                 const newEventEmbed = new Discord.MessageEmbed()
@@ -170,6 +185,7 @@ module.exports = {
 
                                             // Create an event in MongoDB using the event name, date, unique emoji, newEventEmbed message ID, and the event role ID
                                             new Event({
+                                                guildId: interaction.guildId,
                                                 eventName: interaction.options.getString('name'),
                                                 eventDate: interaction.options.getString('date'),
                                                 eventEmoji: interaction.options.getString('emoji'),
@@ -182,115 +198,48 @@ module.exports = {
                                             });
                                         });
                                 });
-                            } else if (interaction.options.getString('date2')) {
-                                if (interaction.options.getString('date3')) {
-                                    if (interaction.options.getString('date4')) {
+                            } else if (multiple) {
 
-                                        // Four options for event date exist; create newEventEmbed using event name and Unsplash thumbnail with author info
-                                        const newEventEmbed = new Discord.MessageEmbed()
-                                            .setColor('#ff0cff')
-                                            .setTitle('New event: ' + interaction.options.getString('name'))
-                                            .setDescription('React to this message to indicate which day(s) you can go!')
-                                            .setThumbnail(thumbnailUrl)
-                                            .addField('When:', `:one: ${interaction.options.getString('date')}\n:two: ${interaction.options.getString('date2')}\n:three: ${interaction.options.getString('date3')}\n:four: ${interaction.options.getString('date4')}`, false)
-                                            .setFooter(thumbnailFooter);
+                                // Multiple options for event date exist; create newEventEmbed using event name and Unsplash thumbnail with author info
+                                const newEventEmbed = new Discord.MessageEmbed()
+                                    .setColor('#ff0cff')
+                                    .setTitle('New event: ' + interaction.options.getString('name'))
+                                    .setDescription('React to this message to indicate which day(s) you can go!')
+                                    .setThumbnail(thumbnailUrl)
+                                    .setFooter(thumbnailFooter);
 
-                                        // Send newEventEmbed, get message ID through newEventMsg
-                                        interaction.reply({ embeds: [newEventEmbed] }).then(async (newEventInteraction) => {
-                                            const newEventMsg = await interaction.fetchReply();
+                                let counter = 0;
+                                dates.forEach(date => {
+                                    counter++;
+                                    newEventEmbed.addField('Potential date ' + counter + ':', date, true);
+                                });
 
-                                            // Create a role for the event using the event name and unique emoji
-                                            interaction.guild.roles.create({ name: interaction.options.getString('name') + ' ' + interaction.options.getString('emoji') })
-                                                .then((newEventRole) => {
+                                // Send newEventEmbed, get message ID through newEventMsg
+                                interaction.reply({ embeds: [newEventEmbed] }).then(async (newEventInteraction) => {
+                                    const newEventMsg = await interaction.fetchReply();
 
-                                                    // Create an event in MongoDB using the event name, date, unique emoji, newEventEmbed message ID, and the event role ID
-                                                    new Event({
-                                                        eventName: interaction.options.getString('name'),
-                                                        eventDate: 'TBD',
-                                                        eventEmoji: interaction.options.getString('emoji'),
-                                                        eventMessageId: newEventMsg.id,
-                                                        eventRoleId: newEventRole.id
-                                                    }).save().then((newEvent) => {
+                                    // Create a role for the event using the event name and unique emoji
+                                    interaction.guild.roles.create({ name: interaction.options.getString('name') + ' ' + interaction.options.getString('emoji') })
+                                        .then((newEventRole) => {
 
-                                                        // React to the newEventEmbed with the event date options
-                                                        newEventMsg.react('1️⃣');
-                                                        newEventMsg.react('2️⃣');
-                                                        newEventMsg.react('3️⃣');
-                                                        newEventMsg.react('4️⃣');
-                                                    });
-                                                });
-                                        });
-                                    } else if (!interaction.options.getString('date4')) {
+                                            // Create an event in MongoDB using the event name, date, unique emoji, newEventEmbed message ID, and the event role ID
+                                            new Event({
+                                                guildId: interaction.guildId,
+                                                eventName: interaction.options.getString('name'),
+                                                eventDate: 'TBD',
+                                                eventEmoji: interaction.options.getString('emoji'),
+                                                eventMessageId: newEventMsg.id,
+                                                eventRoleId: newEventRole.id
+                                            }).save().then((newEvent) => {
 
-                                        // Three options for event date exist; create newEventEmbed using event name and Unsplash thumbnail with author info
-                                        const newEventEmbed = new Discord.MessageEmbed()
-                                            .setColor('#ff0cff')
-                                            .setTitle('New event: ' + interaction.options.getString('name'))
-                                            .setDescription('React to this message to indicate which day(s) you can go!')
-                                            .setThumbnail(thumbnailUrl)
-                                            .addField('When:', `:one: ${interaction.options.getString('date')}\n:two: ${interaction.options.getString('date2')}\n:three: ${interaction.options.getString('date3')}`, false)
-                                            .setFooter(thumbnailFooter);
-
-                                        // Send newEventEmbed, get message ID through newEventMsg
-                                        interaction.reply({ embeds: [newEventEmbed] }).then(async (newEventInteraction) => {
-                                            const newEventMsg = await interaction.fetchReply();
-
-                                            // Create a role for the event using the event name and unique emoji
-                                            interaction.guild.roles.create({ name: interaction.options.getString('name') + ' ' + interaction.options.getString('emoji') })
-                                                .then((newEventRole) => {
-
-                                                    // Create an event in MongoDB using the event name, date, unique emoji, newEventEmbed message ID, and the event role ID
-                                                    new Event({
-                                                        eventName: interaction.options.getString('name'),
-                                                        eventDate: 'TBD',
-                                                        eventEmoji: interaction.options.getString('emoji'),
-                                                        eventMessageId: newEventMsg.id,
-                                                        eventRoleId: newEventRole.id
-                                                    }).save().then((newEvent) => {
-
-                                                        // React to the newEventEmbed with the event date options
-                                                        newEventMsg.react('1️⃣');
-                                                        newEventMsg.react('2️⃣');
-                                                        newEventMsg.react('3️⃣');
-                                                    });
-                                                });
-                                        });
-                                    }
-                                } else if (!interaction.options.getString('date3')) {
-                                    
-                                    // Two options for event date exist; create newEventEmbed using event name and Unsplash thumbnail with author info
-                                    const newEventEmbed = new Discord.MessageEmbed()
-                                        .setColor('#ff0cff')
-                                        .setTitle('New event: ' + interaction.options.getString('name'))
-                                        .setDescription('React to this message to indicate which day(s) you can go!')
-                                        .setThumbnail(thumbnailUrl)
-                                        .addField('When:', `:one: ${interaction.options.getString('date')}\n:two: ${interaction.options.getString('date2')}`, false)
-                                        .setFooter(thumbnailFooter);
-
-                                    // Send newEventEmbed, get message ID through newEventMsg
-                                    interaction.reply({ embeds: [newEventEmbed] }).then(async (newEventInteraction) => {
-                                        const newEventMsg = await interaction.fetchReply();
-
-                                        // Create a role for the event using the event name and unique emoji
-                                        interaction.guild.roles.create({ name: interaction.options.getString('name') + ' ' + interaction.options.getString('emoji') })
-                                            .then((newEventRole) => {
-
-                                                // Create an event in MongoDB using the event name, date, unique emoji, newEventEmbed message ID, and the event role ID
-                                                new Event({
-                                                    eventName: interaction.options.getString('name'),
-                                                    eventDate: 'TBD',
-                                                    eventEmoji: interaction.options.getString('emoji'),
-                                                    eventMessageId: newEventMsg.id,
-                                                    eventRoleId: newEventRole.id
-                                                }).save().then((newEvent) => {
-
-                                                    // React to the newEventEmbed with the event date options
-                                                    newEventMsg.react('1️⃣');
-                                                    newEventMsg.react('2️⃣');
-                                                });
+                                                // React to the newEventEmbed with the event date options
+                                                newEventMsg.react('1️⃣');
+                                                newEventMsg.react('2️⃣');
+                                                if (counter >= 3) newEventMsg.react('3️⃣');
+                                                if (counter === 4) newEventMsg.react('4️⃣');
                                             });
-                                    });
-                                }
+                                        });
+                                });
                             }
                         }
                     });
@@ -300,29 +249,26 @@ module.exports = {
         // Execute /event rename
         } else if (interaction.options.getSubcommand() === 'rename') {
 
-            // Make the server ID accessible by the event schema
-            module.exports.guildId = interaction.guildId;
-
             // Dependencies
             const Discord = require('discord.js');
             require('mongoose');
             const Event = require('../config/event-schema');
 
             // Using unique event emoji, find event and pass currentEvent to use for editing original newEventEmbed
-            await Event.findOne({ eventEmoji: interaction.options.getString('emoji') }).then(async (currentEvent) => {
+            await Event.findOne({ guildId: interaction.guildId, eventEmoji: interaction.options.getString('emoji') }).then(async (currentEvent) => {
 
                 // Check if event exists using unique emoji, ignore if it doesn't
                 if (!currentEvent) {
-                    await interaction.reply('Couldn\'t find that event! Try a different emoji.');
+                    await interaction.reply({ content: 'Couldn\'t find that event! Try a different emoji.', ephemeral: true });
                 } else if (currentEvent) {
 
                     // Using unique event emoji, find event and change name
-                    await Event.updateOne({ eventEmoji: interaction.options.getString('emoji') }, { eventName: interaction.options.getString('name') }).then(async () => {
+                    await Event.updateOne({ guildId: interaction.guildId, eventEmoji: interaction.options.getString('emoji') }, { eventName: interaction.options.getString('name') }).then(async () => {
 
                         // Search for newEventEmbed message in channel where /event rename command is used
                         await interaction.channel.messages.fetch(currentEvent.eventMessageId).then((currentEventMsg) => {
                             if (!currentEventMsg) {
-                                interaction.reply('Couldn\'t find that event! Try searching in the channel where it was created.');
+                                interaction.reply({ content: 'Couldn\'t find that event! Try searching in the channel where it was created.', ephemeral: true });
                             } else if (currentEventMsg) {
 
                                 // Edit original newEventEmbed
@@ -341,7 +287,7 @@ module.exports = {
                         interaction.guild.roles.fetch(currentEvent.eventRoleId).then(eventRole => {
                             eventRole.edit({ name: interaction.options.getString('name') + ' ' + currentEvent.eventEmoji });
                         });
-                        await interaction.reply('Event renamed! Check the original message for the new details.');
+                        await interaction.reply({ content: 'Event renamed! Check the original message for the new details.', ephemeral: true });
                     });
                 }
             });
@@ -349,29 +295,26 @@ module.exports = {
         // Execute /event reschedule
         } else if (interaction.options.getSubcommand() === 'reschedule') {
 
-            // Make the server ID accessible by the event schema
-            module.exports.guildId = interaction.guildId;
-
             // Dependencies
             const Discord = require('discord.js');
             require('mongoose');
             const Event = require('../config/event-schema');
 
             // Using unique event emoji, find event and pass currentEvent to use for editing original newEventEmbed
-            await Event.findOne({ eventEmoji: interaction.options.getString('emoji') }).then(async (currentEvent) => {
+            await Event.findOne({ guildId: interaction.guildId, eventEmoji: interaction.options.getString('emoji') }).then(async (currentEvent) => {
 
                 // Check if event exists using unique emoji, ignore if it doesn't
                 if (!currentEvent) {
-                    await interaction.reply('Couldn\'t find that event! Try a different emoji.');
+                    await interaction.reply({ content: 'Couldn\'t find that event! Try a different emoji.', ephemeral: true });
                 } else if (currentEvent) {
 
                     // Using unique event emoji, find event and change date
-                    await Event.updateOne({ eventEmoji: interaction.options.getString('emoji') }, { eventDate: interaction.options.getString('date') }).then(async () => {
+                    await Event.updateOne({ guildId: interaction.guildId, eventEmoji: interaction.options.getString('emoji') }, { eventDate: interaction.options.getString('date') }).then(async () => {
 
                         // Search for newEventEmbed message in channel where /event reschedule command is used
                         await interaction.channel.messages.fetch(currentEvent.eventMessageId).then((currentEventMsg) => {
                             if (!currentEventMsg) {
-                                interaction.reply('Couldn\'t find that event! Try searching in the channel where it was created.');
+                                interaction.reply({ content: 'Couldn\'t find that event! Try searching in the channel where it was created.', ephemeral: true });
                             } else if (currentEventMsg) {
 
                                 // Edit original newEventEmbed
@@ -391,7 +334,8 @@ module.exports = {
                             }
                         });
 
-                        await interaction.reply('Event rescheduled! Check the original message for the new details.');
+                        await interaction.reply({ content: 'Event rescheduled! Check the original message for the new details.', ephemeral: true });
+                        await interaction.channel.send('<@&' + currentEvent.eventRoleId + '>, the event was rescheduled — check the original embed to make sure you can still make it!');
                     });
                 }
             });
@@ -399,26 +343,23 @@ module.exports = {
         // Execute /event cancel
         } else if (interaction.options.getSubcommand() === 'cancel') {
 
-            // Make the server ID accessible by the event schema
-            module.exports.guildId = interaction.guildId;
-
             // Dependencies
             const Discord = require('discord.js');
             require('mongoose');
             const Event = require('../config/event-schema');
 
             // Using unique event emoji, find event and pass currentEvent to use for editing original newEventEmbed
-            await Event.findOne({ eventEmoji: interaction.options.getString('emoji') }).then(async (currentEvent) => {
+            await Event.findOne({ guildId: interaction.guildId, eventEmoji: interaction.options.getString('emoji') }).then(async (currentEvent) => {
 
                 // Check if event exists using unique emoji, ignore if it doesn't
                 if (!currentEvent) {
-                    await interaction.reply('Couldn\'t find that event! Try a different emoji.');
+                    await interaction.reply({ content: 'Couldn\'t find that event! Try a different emoji.', ephemeral: true });
                 } else if (currentEvent) {
 
                     // Search for newEventEmbed message in channel where /event cancel command is used
                     await interaction.channel.messages.fetch(currentEvent.eventMessageId).then((currentEventMsg) => {
                         if (!currentEventMsg) {
-                            interaction.reply('Couldn\'t find that event! Try searching in the channel where it was created.');
+                            interaction.reply({ content: 'Couldn\'t find that event! Try searching in the channel where it was created.', ephemeral: true });
                         } else if (currentEventMsg) {
 
                             // Edit original newEventEmbed
@@ -434,12 +375,12 @@ module.exports = {
                         }
                     });
 
+                    // Find event using unique emoji and delete from MongoDB
+                    await Event.deleteOne({ guildId: interaction.guildId, eventEmoji: interaction.options.getString('emoji') });
+                    await interaction.reply('**' + currentEvent.eventName + '** (<@&' + currentEvent.eventRoleId + '>) was canceled and the associated role deleted.');
+
                     // Delete event role
                     await interaction.guild.roles.cache.get(currentEvent.eventRoleId).delete();
-
-                    // Find event using unique emoji and delete from MongoDB
-                    await Event.deleteOne({ eventEmoji: interaction.options.getString('emoji') });
-                    await interaction.reply('Event canceled; the original message was edited accordingly :(');
                 }
             });
         }

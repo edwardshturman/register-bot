@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## 0.6.2 — 2022-08-13
+
+### Changed
+
+- Relevant messages, like event reschedules, now ping people, and those like errors send ephemerally (only appears to the user that sends the command)
+
+### Fixed
+
+- Fixed a pesky bug that would confuse which server an event was associated with (#19)
+
 ## 0.6.0 — 2022-03-25
 
 ### Added
