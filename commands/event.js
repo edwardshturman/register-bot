@@ -118,7 +118,7 @@ module.exports = {
             // Search for an existing event emoji and return if it exists
             Event.findOne({ guildId: interaction.guildId, eventEmoji: interaction.options.getString('emoji') }).then((eventExists) => {
                 if (eventExists) {
-                    interaction.reply('This event already exists! Try a different emoji.');
+                    interaction.reply({ content: 'This event already exists! Try a different emoji.', ephemeral: true });
                 } else if (!eventExists) {
 
                     // Fetch thumbnail from Unsplash
@@ -131,7 +131,7 @@ module.exports = {
                         let thumbnailUrl;
                         let thumbnailFooter;
                         if (result.errors) {
-                            interaction.reply('Encountered an error fetching a thumbnail (check bot console)! To avoid confusion, event was not created in database.');
+                            interaction.reply({ content: 'Encountered an error fetching a thumbnail (check bot console)! To avoid confusion, event was not created in database.', ephemeral: true });
                             console.log(result.errors[0]);
                         } else {
                             const feed = result.response;
@@ -259,7 +259,7 @@ module.exports = {
 
                 // Check if event exists using unique emoji, ignore if it doesn't
                 if (!currentEvent) {
-                    await interaction.reply('Couldn\'t find that event! Try a different emoji.');
+                    await interaction.reply({ content: 'Couldn\'t find that event! Try a different emoji.', ephemeral: true });
                 } else if (currentEvent) {
 
                     // Using unique event emoji, find event and change name
@@ -268,7 +268,7 @@ module.exports = {
                         // Search for newEventEmbed message in channel where /event rename command is used
                         await interaction.channel.messages.fetch(currentEvent.eventMessageId).then((currentEventMsg) => {
                             if (!currentEventMsg) {
-                                interaction.reply('Couldn\'t find that event! Try searching in the channel where it was created.');
+                                interaction.reply({ content: 'Couldn\'t find that event! Try searching in the channel where it was created.', ephemeral: true });
                             } else if (currentEventMsg) {
 
                                 // Edit original newEventEmbed
@@ -287,7 +287,7 @@ module.exports = {
                         interaction.guild.roles.fetch(currentEvent.eventRoleId).then(eventRole => {
                             eventRole.edit({ name: interaction.options.getString('name') + ' ' + currentEvent.eventEmoji });
                         });
-                        await interaction.reply('Event renamed! Check the original message for the new details.');
+                        await interaction.reply({ content: 'Event renamed! Check the original message for the new details.', ephemeral: true });
                     });
                 }
             });
@@ -305,7 +305,7 @@ module.exports = {
 
                 // Check if event exists using unique emoji, ignore if it doesn't
                 if (!currentEvent) {
-                    await interaction.reply('Couldn\'t find that event! Try a different emoji.');
+                    await interaction.reply({ content: 'Couldn\'t find that event! Try a different emoji.', ephemeral: true });
                 } else if (currentEvent) {
 
                     // Using unique event emoji, find event and change date
@@ -314,7 +314,7 @@ module.exports = {
                         // Search for newEventEmbed message in channel where /event reschedule command is used
                         await interaction.channel.messages.fetch(currentEvent.eventMessageId).then((currentEventMsg) => {
                             if (!currentEventMsg) {
-                                interaction.reply('Couldn\'t find that event! Try searching in the channel where it was created.');
+                                interaction.reply({ content: 'Couldn\'t find that event! Try searching in the channel where it was created.', ephemeral: true });
                             } else if (currentEventMsg) {
 
                                 // Edit original newEventEmbed
@@ -334,7 +334,8 @@ module.exports = {
                             }
                         });
 
-                        await interaction.reply('Event rescheduled! Check the original message for the new details.');
+                        await interaction.reply({ content: 'Event rescheduled! Check the original message for the new details.', ephemeral: true });
+                        await interaction.channel.send('<@&' + currentEvent.eventRoleId + '>, the event was rescheduled — check the original embed to make sure you can still make it!');
                     });
                 }
             });
@@ -352,13 +353,13 @@ module.exports = {
 
                 // Check if event exists using unique emoji, ignore if it doesn't
                 if (!currentEvent) {
-                    await interaction.reply('Couldn\'t find that event! Try a different emoji.');
+                    await interaction.reply({ content: 'Couldn\'t find that event! Try a different emoji.', ephemeral: true });
                 } else if (currentEvent) {
 
                     // Search for newEventEmbed message in channel where /event cancel command is used
                     await interaction.channel.messages.fetch(currentEvent.eventMessageId).then((currentEventMsg) => {
                         if (!currentEventMsg) {
-                            interaction.reply('Couldn\'t find that event! Try searching in the channel where it was created.');
+                            interaction.reply({ content: 'Couldn\'t find that event! Try searching in the channel where it was created.', ephemeral: true });
                         } else if (currentEventMsg) {
 
                             // Edit original newEventEmbed
@@ -374,12 +375,12 @@ module.exports = {
                         }
                     });
 
-                    // Delete event role
-                    await interaction.guild.roles.cache.get(currentEvent.eventRoleId).delete();
-
                     // Find event using unique emoji and delete from MongoDB
                     await Event.deleteOne({ guildId: interaction.guildId, eventEmoji: interaction.options.getString('emoji') });
-                    await interaction.reply('Event canceled; the original message was edited accordingly :(');
+                    await interaction.reply('**' + currentEvent.eventName + '** (<@&' + currentEvent.eventRoleId + '>) was canceled and the associated role deleted.');
+
+                    // Delete event role
+                    await interaction.guild.roles.cache.get(currentEvent.eventRoleId).delete();
                 }
             });
         }
