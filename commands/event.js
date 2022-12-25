@@ -1,128 +1,114 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+import { SlashCommandBuilder } from '@discordjs/builders';
+import Discord from 'discord.js';
+import Event from '../schemas/event-schema.js';
+import fetch from 'node-fetch';
+import unsplash from 'unsplash-js';
 
-module.exports = {
+const eventCommand = {
     data: new SlashCommandBuilder()
 
         // Base event command
         .setName('event')
         .setDescription('Tool for planning and managing events')
-        .addSubcommand(helpSubcommand =>
-            helpSubcommand
-                .setName('help')
-                .setDescription('Display event planning help'))
+        .addSubcommand(helpSubcommand => helpSubcommand
+            .setName('help')
+            .setDescription('Display event planning help'))
 
         // Add subcommand
-        .addSubcommand(addSubcommand =>
-            addSubcommand
-                .setName('add')
-                .setDescription('Create a new event')
-                .addStringOption(eventName =>
-                    eventName
-                        .setName('name')
-                        .setDescription('The name of the event; best if named by location')
-                        .setRequired(true))
-                .addStringOption(eventEmoji =>
-                    eventEmoji
-                        .setName('emoji')
-                        .setDescription('A unique emoji for the event')
-                        .setRequired(true))
-                .addStringOption(eventDate =>
-                    eventDate
-                        .setName('date')
-                        .setDescription('The date of the event; can be specific or arbitrary')
-                        .setRequired(true))
-                .addStringOption(eventDate2 =>
-                    eventDate2
-                        .setName('date2')
-                        .setDescription('Another potential date for the event')
-                        .setRequired(false))
-                .addStringOption(eventDate3 =>
-                    eventDate3
-                        .setName('date3')
-                        .setDescription('Another potential date for the event')
-                        .setRequired(false))
-                .addStringOption(eventDate4 =>
-                    eventDate4
-                        .setName('date4')
-                        .setDescription('Another potential date for the event')
-                        .setRequired(false)))
+        .addSubcommand(addSubcommand => addSubcommand
+            .setName('add')
+            .setDescription('Create a new event')
+            .addStringOption(eventName => eventName
+                .setName('name')
+                .setDescription('The name of the event; best if named by location')
+                .setRequired(true))
+            .addStringOption(eventEmoji => eventEmoji
+                .setName('emoji')
+                .setDescription('A unique emoji for the event')
+                .setRequired(true))
+            .addStringOption(eventDate => eventDate
+                .setName('date')
+                .setDescription('The date of the event; can be specific or arbitrary')
+                .setRequired(true))
+            .addStringOption(eventDate2 => eventDate2
+                .setName('date2')
+                .setDescription('Another potential date for the event')
+                .setRequired(false))
+            .addStringOption(eventDate3 => eventDate3
+                .setName('date3')
+                .setDescription('Another potential date for the event')
+                .setRequired(false))
+            .addStringOption(eventDate4 => eventDate4
+                .setName('date4')
+                .setDescription('Another potential date for the event')
+                .setRequired(false)))
 
         // Rename subcommand
-        .addSubcommand(renameSubcommand =>
-            renameSubcommand
-                .setName('rename')
-                .setDescription('Rename an event')
-                .addStringOption(eventEmoji =>
-                    eventEmoji
-                        .setName('emoji')
-                        .setDescription('The unique emoji for the event')
-                        .setRequired(true))
-                .addStringOption(eventName =>
-                    eventName
-                        .setName('name')
-                        .setDescription('The new name for the event')
-                        .setRequired(true)))
+        .addSubcommand(renameSubcommand => renameSubcommand
+            .setName('rename')
+            .setDescription('Rename an event')
+            .addStringOption(eventEmoji => eventEmoji
+                .setName('emoji')
+                .setDescription('The unique emoji for the event')
+                .setRequired(true))
+            .addStringOption(eventName => eventName
+                .setName('name')
+                .setDescription('The new name for the event')
+                .setRequired(true)))
 
         // Reschedule subcommand
-        .addSubcommand(rescheduleSubcommand =>
-            rescheduleSubcommand
-                .setName('reschedule')
-                .setDescription('Reschedule an event')
-                .addStringOption(eventEmoji =>
-                    eventEmoji
-                        .setName('emoji')
-                        .setDescription('The unique emoji for the event')
-                        .setRequired(true))
-                .addStringOption(eventDate =>
-                    eventDate
-                        .setName('date')
-                        .setDescription('The new date for the event')
-                        .setRequired(true)))
+        .addSubcommand(rescheduleSubcommand => rescheduleSubcommand
+            .setName('reschedule')
+            .setDescription('Reschedule an event')
+            .addStringOption(eventEmoji => eventEmoji
+                .setName('emoji')
+                .setDescription('The unique emoji for the event')
+                .setRequired(true))
+            .addStringOption(eventDate => eventDate
+                .setName('date')
+                .setDescription('The new date for the event')
+                .setRequired(true)))
 
         // Cancel subcommand
-        .addSubcommand(cancelSubcommand =>
-            cancelSubcommand
-                .setName('cancel')
-                .setDescription('Cancel an event :(')
-                .addStringOption(eventEmoji =>
-                    eventEmoji
-                        .setName('emoji')
-                        .setDescription('The unique emoji for the event')
-                        .setRequired(true))),
+        .addSubcommand(cancelSubcommand => cancelSubcommand
+            .setName('cancel')
+            .setDescription('Cancel an event :(')
+            .addStringOption(eventEmoji => eventEmoji
+                .setName('emoji')
+                .setDescription('The unique emoji for the event')
+                .setRequired(true))),
 
     async execute (interaction) {
-        // Dependencies
-        const Discord = require('discord.js');
-
         // On /event help, display event command help
         if (interaction.options.getSubcommand() === 'help') {
             const eventHelpEmbed = new Discord.MessageEmbed()
                 .setColor('#ff0cff')
                 .setTitle('Event command')
                 .setDescription('Used to create new events and roles we can track/mention')
-                .addField('add', '\`/event add [name of event] [event emoji] [event date] [optional: another potential event date] ...\` *(up to four potential dates)*', false)
-                .addField('reschedule', '\`/event reschedule [event emoji] [date]\`', false)
-                .addField('cancel', '\`/event cancel [event emoji]\`', false);
+                .addField('add', '`/event add [name of event] [event emoji] [event date] [optional: another potential event date] ...` *(up to four potential dates)*', false)
+                .addField('reschedule', '`/event reschedule [event emoji] [date]`', false)
+                .addField('cancel', '`/event cancel [event emoji]`', false);
             await interaction.reply({ embeds: [eventHelpEmbed] });
+        }
 
         // Execute /event add
-        } else if (interaction.options.getSubcommand() === 'add') {
-
-            // Dependencies
-            const Discord = require('discord.js');
-            require('mongoose');
-            const Event = require('../config/event-schema');
-            global.fetch = require('node-fetch');
-            const unsplash = require('unsplash-js').createApi({ accessKey: process.env.UNSPLASH_ACCESS_KEY });
+        else if (interaction.options.getSubcommand() === 'add') {
+            const unsplashConnection = unsplash.createApi({
+                accessKey: process.env.UNSPLASH_ACCESS_KEY,
+                fetch: fetch
+            });
 
             // Search for an existing event emoji and return if it exists
-            Event.findOne({ guildId: interaction.guildId, eventEmoji: interaction.options.getString('emoji') }).then((eventExists) => {
-                if (eventExists) {
+            Event.findOne({
+                guildId: interaction.guildId,
+                eventEmoji: interaction.options.getString('emoji')
+            }).then((eventExists) => {
+                if (eventExists)
                     interaction.reply({ content: 'This event already exists! Try a different emoji.', ephemeral: true });
-                } else if (!eventExists) {
 
+                else if (!eventExists) {
                     // Fetch thumbnail from Unsplash
-                    unsplash.search.getPhotos({
+                    unsplashConnection.search.getPhotos({
                         query: interaction.options.getString('name'),
                         page: 1,
                         perPage: 10,
@@ -165,7 +151,6 @@ module.exports = {
 
                             // Only one date specified
                             if (!multiple) {
-
                                 // Create newEventEmbed using event name, date, and Unsplash thumbnail with author info
                                 const newEventEmbed = new Discord.MessageEmbed()
                                     .setColor('#ff0cff')
@@ -182,7 +167,6 @@ module.exports = {
                                     // Create a role for the event using the event name and unique emoji
                                     interaction.guild.roles.create({ name: interaction.options.getString('name') + ' ' + interaction.options.getString('emoji') })
                                         .then((newEventRole) => {
-
                                             // Create an event in MongoDB using the event name, date, unique emoji, newEventEmbed message ID, and the event role ID
                                             new Event({
                                                 guildId: interaction.guildId,
@@ -192,14 +176,14 @@ module.exports = {
                                                 eventMessageId: newEventMsg.id,
                                                 eventRoleId: newEventRole.id
                                             }).save().then((newEvent) => {
-
                                                 // React to the newEventEmbed with the event unique emoji
                                                 newEventMsg.react(newEvent.eventEmoji);
                                             });
                                         });
                                 });
-                            } else if (multiple) {
+                            }
 
+                            else if (multiple) {
                                 // Multiple options for event date exist; create newEventEmbed using event name and Unsplash thumbnail with author info
                                 const newEventEmbed = new Discord.MessageEmbed()
                                     .setColor('#ff0cff')
@@ -221,7 +205,6 @@ module.exports = {
                                     // Create a role for the event using the event name and unique emoji
                                     interaction.guild.roles.create({ name: interaction.options.getString('name') + ' ' + interaction.options.getString('emoji') })
                                         .then((newEventRole) => {
-
                                             // Create an event in MongoDB using the event name, date, unique emoji, newEventEmbed message ID, and the event role ID
                                             new Event({
                                                 guildId: interaction.guildId,
@@ -231,7 +214,6 @@ module.exports = {
                                                 eventMessageId: newEventMsg.id,
                                                 eventRoleId: newEventRole.id
                                             }).save().then((newEvent) => {
-
                                                 // React to the newEventEmbed with the event date options
                                                 newEventMsg.react('1️⃣');
                                                 newEventMsg.react('2️⃣');
@@ -245,32 +227,25 @@ module.exports = {
                     });
                 }
             });
+        }
 
         // Execute /event rename
-        } else if (interaction.options.getSubcommand() === 'rename') {
-
-            // Dependencies
-            const Discord = require('discord.js');
-            require('mongoose');
-            const Event = require('../config/event-schema');
-
+        else if (interaction.options.getSubcommand() === 'rename') {
             // Using unique event emoji, find event and pass currentEvent to use for editing original newEventEmbed
             await Event.findOne({ guildId: interaction.guildId, eventEmoji: interaction.options.getString('emoji') }).then(async (currentEvent) => {
-
                 // Check if event exists using unique emoji, ignore if it doesn't
-                if (!currentEvent) {
+                if (!currentEvent)
                     await interaction.reply({ content: 'Couldn\'t find that event! Try a different emoji.', ephemeral: true });
-                } else if (currentEvent) {
 
+                else if (currentEvent) {
                     // Using unique event emoji, find event and change name
                     await Event.updateOne({ guildId: interaction.guildId, eventEmoji: interaction.options.getString('emoji') }, { eventName: interaction.options.getString('name') }).then(async () => {
-
                         // Search for newEventEmbed message in channel where /event rename command is used
                         await interaction.channel.messages.fetch(currentEvent.eventMessageId).then((currentEventMsg) => {
-                            if (!currentEventMsg) {
+                            if (!currentEventMsg)
                                 interaction.reply({ content: 'Couldn\'t find that event! Try searching in the channel where it was created.', ephemeral: true });
-                            } else if (currentEventMsg) {
 
+                            else if (currentEventMsg) {
                                 // Edit original newEventEmbed
                                 const newEventEmbed = new Discord.MessageEmbed()
                                     .setColor('#ff0cff')
@@ -291,32 +266,25 @@ module.exports = {
                     });
                 }
             });
+        }
 
         // Execute /event reschedule
-        } else if (interaction.options.getSubcommand() === 'reschedule') {
-
-            // Dependencies
-            const Discord = require('discord.js');
-            require('mongoose');
-            const Event = require('../config/event-schema');
-
+        else if (interaction.options.getSubcommand() === 'reschedule') {
             // Using unique event emoji, find event and pass currentEvent to use for editing original newEventEmbed
             await Event.findOne({ guildId: interaction.guildId, eventEmoji: interaction.options.getString('emoji') }).then(async (currentEvent) => {
-
                 // Check if event exists using unique emoji, ignore if it doesn't
-                if (!currentEvent) {
+                if (!currentEvent)
                     await interaction.reply({ content: 'Couldn\'t find that event! Try a different emoji.', ephemeral: true });
-                } else if (currentEvent) {
 
+                else if (currentEvent) {
                     // Using unique event emoji, find event and change date
                     await Event.updateOne({ guildId: interaction.guildId, eventEmoji: interaction.options.getString('emoji') }, { eventDate: interaction.options.getString('date') }).then(async () => {
-
                         // Search for newEventEmbed message in channel where /event reschedule command is used
                         await interaction.channel.messages.fetch(currentEvent.eventMessageId).then((currentEventMsg) => {
-                            if (!currentEventMsg) {
+                            if (!currentEventMsg)
                                 interaction.reply({ content: 'Couldn\'t find that event! Try searching in the channel where it was created.', ephemeral: true });
-                            } else if (currentEventMsg) {
 
+                            else if (currentEventMsg) {
                                 // Edit original newEventEmbed
                                 const newEventEmbed = new Discord.MessageEmbed()
                                     .setColor('#ff0cff')
@@ -339,29 +307,23 @@ module.exports = {
                     });
                 }
             });
+        }
 
         // Execute /event cancel
-        } else if (interaction.options.getSubcommand() === 'cancel') {
-
-            // Dependencies
-            const Discord = require('discord.js');
-            require('mongoose');
-            const Event = require('../config/event-schema');
-
+        else if (interaction.options.getSubcommand() === 'cancel') {
             // Using unique event emoji, find event and pass currentEvent to use for editing original newEventEmbed
             await Event.findOne({ guildId: interaction.guildId, eventEmoji: interaction.options.getString('emoji') }).then(async (currentEvent) => {
-
                 // Check if event exists using unique emoji, ignore if it doesn't
-                if (!currentEvent) {
+                if (!currentEvent)
                     await interaction.reply({ content: 'Couldn\'t find that event! Try a different emoji.', ephemeral: true });
-                } else if (currentEvent) {
 
+                else if (currentEvent) {
                     // Search for newEventEmbed message in channel where /event cancel command is used
                     await interaction.channel.messages.fetch(currentEvent.eventMessageId).then((currentEventMsg) => {
-                        if (!currentEventMsg) {
+                        if (!currentEventMsg)
                             interaction.reply({ content: 'Couldn\'t find that event! Try searching in the channel where it was created.', ephemeral: true });
-                        } else if (currentEventMsg) {
 
+                        else if (currentEventMsg) {
                             // Edit original newEventEmbed
                             const newEventEmbed = new Discord.MessageEmbed()
                                 .setColor('#ff0cff')
@@ -386,3 +348,5 @@ module.exports = {
         }
     }
 };
+
+export default eventCommand;

@@ -1,21 +1,21 @@
 // Dependencies
-require('@discordjs/builders');
-const fs = require('fs');
-const { REST } = require('@discordjs/rest');
-const { Routes } = require('discord-api-types/v9');
-require('dotenv').config();
+import { REST } from '@discordjs/rest';
+import { Routes } from 'discord-api-types/v9';
+import { config } from 'dotenv';
 
-// Create commands array and identify commands by JS file type in ./commands/
+// Commands
+import * as commandsList from './commands.js';
+
+// Load environment variables
+if (process.env.ENV !== 'PROD')
+    config();
+
+// Load commands
 const commands = [];
-const commandFiles = fs.readdirSync('./commands/').filter(file => file.endsWith('.js'));
-
-// Push commands to commands array, for each command in ./commands/
-for (const file of commandFiles) {
-    const command = require(`./commands/${file}`);
+for (const command of commandsList.default)
     commands.push(command.data.toJSON());
-}
 
-const rest = new REST({ version: '9' }).setToken(process.env.TOKEN);
+const rest = new REST({ version: '9' }).setToken(process.env.BOT_TOKEN);
 
 // Deploy slash commands
 (async () => {
@@ -24,15 +24,23 @@ const rest = new REST({ version: '9' }).setToken(process.env.TOKEN);
 
         // Production environment, deploy commands globally
         if (process.env.ENV === 'PROD') {
+            // Deploy global commands
             await rest.put(
-                Routes.applicationCommands(process.env.CLIENTID),
+                Routes.applicationCommands(process.env.BOT_CLIENT_ID),
                 { body: commands }
             );
 
-        // Development environment, deploy commands to test server
-        } else if (process.env.ENV === 'DEV') {
+            // Clear guild commands
             await rest.put(
-                Routes.applicationGuildCommands(process.env.CLIENTID, process.env.GUILDID),
+                Routes.applicationGuildCommands(process.env.BOT_CLIENT_ID, process.env.DEV_SERVER_ID),
+                { body: [] }
+            );
+        }
+
+        // Development environment, deploy commands locally
+        else if (process.env.ENV === 'DEV') {
+            await rest.put(
+                Routes.applicationGuildCommands(process.env.BOT_CLIENT_ID, process.env.DEV_SERVER_ID),
                 { body: commands }
             );
         }

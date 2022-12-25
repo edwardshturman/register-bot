@@ -1,16 +1,22 @@
 // Dependencies
-require('discord.js');
-require('dotenv').config();
-const fs = require('fs');
-const mongoose = require('mongoose');
+import { Client, Collection, Intents } from 'discord.js';
+import mongoose from 'mongoose';
+import { config } from 'dotenv';
+import Event from './schemas/event-schema.js';
+
+// Commands
+import * as commands from './commands.js';
+
+// Load environment variables
+if (process.env.ENV !== 'PROD')
+    config();
 
 // Connect to MongoDB
-mongoose.connect(process.env.DBCONNECTION, () => {
+mongoose.connect(process.env.DB_CONNECTION, () => {
     console.log('Register connected to MongoDB!');
 });
 
 // Launch instance of Discord
-const { Client, Collection, Intents } = require('discord.js');
 const client = new Client({
     intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_MESSAGE_REACTIONS],
     partials: ['MESSAGE', 'GUILD_MEMBER', 'REACTION', 'USER']
@@ -19,17 +25,13 @@ const client = new Client({
 // Create collection of commands
 client.commands = new Collection();
 
-// Check for correct file type (JavaScript) and require command files when running given command
-const commandFiles = fs.readdirSync('./commands/').filter(file => file.endsWith('.js'));
-for (const file of commandFiles) {
-    const command = require(`./commands/${file}`);
+for (const command of commands.default)
     client.commands.set(command.data.name, command);
-}
 
 // Log launch, set status
 client.once('ready', () => {
     console.log('Register is online!');
-    client.user.setActivity('/event | v0.6.2', { type: 'LISTENING' });
+    client.user.setActivity('/event | v0.6.3', { type: 'LISTENING' });
 });
 
 // Listens for new servers, might do something with this later
@@ -82,19 +84,15 @@ client.on('messageReactionAdd', async (reaction, user) => {
     }
 
     // Check to see if a reaction is on an event message; if it is, add the event role to the user reacting
-    const Event = require('./config/event-schema');
     Event.findOne({ eventMessageId: reaction.message.id }).then((currentEvent) => {
-        if (currentEvent) {
+        if (currentEvent)
             if (reaction.emoji.name === currentEvent.eventEmoji) {
                 reaction.message.guild.members.fetch(user.id).then(member => {
-
                     // Ignore event message reactions if by a bot
-                    if (!member.user.bot) {
+                    if (!member.user.bot)
                         member.roles.add(currentEvent.eventRoleId);
-                    }
                 });
             }
-        }
     });
 });
 
@@ -113,17 +111,14 @@ client.on('messageReactionRemove', async (reaction, user) => {
     }
 
     // Check to see if a reaction is on an event message; if it is, remove the event role from the user reacting
-    const Event = require('./config/event-schema');
     Event.findOne({ eventMessageId: reaction.message.id }).then((currentEvent) => {
-        if (currentEvent) {
-            if (reaction.emoji.name === currentEvent.eventEmoji) {
+        if (currentEvent)
+            if (reaction.emoji.name === currentEvent.eventEmoji)
                 reaction.message.guild.members.fetch(user.id).then(member => {
                     member.roles.remove(currentEvent.eventRoleId);
                 });
-            }
-        }
     });
 });
 
 // Login to the bot
-client.login(process.env.TOKEN);
+client.login(process.env.BOT_TOKEN);
