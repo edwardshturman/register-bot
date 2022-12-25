@@ -82,7 +82,7 @@ const eventCommand = {
         // On /event help, display event command help
         if (interaction.options.getSubcommand() === 'help') {
             const eventHelpEmbed = new Discord.MessageEmbed()
-                .setColor('#ff0cff')
+                .setColor('#42a3ef')
                 .setTitle('Event command')
                 .setDescription('Used to create new events and roles we can track/mention')
                 .addField('add', '`/event add [name of event] [event emoji] [event date] [optional: another potential event date] ...` *(up to four potential dates)*', false)
@@ -153,7 +153,7 @@ const eventCommand = {
                             if (!multiple) {
                                 // Create newEventEmbed using event name, date, and Unsplash thumbnail with author info
                                 const newEventEmbed = new Discord.MessageEmbed()
-                                    .setColor('#ff0cff')
+                                    .setColor('#42a3ef')
                                     .setTitle('New event: ' + interaction.options.getString('name'))
                                     .setDescription('React to this message to be given the associated role!')
                                     .setThumbnail(thumbnailUrl)
@@ -186,7 +186,7 @@ const eventCommand = {
                             else if (multiple) {
                                 // Multiple options for event date exist; create newEventEmbed using event name and Unsplash thumbnail with author info
                                 const newEventEmbed = new Discord.MessageEmbed()
-                                    .setColor('#ff0cff')
+                                    .setColor('#42a3ef')
                                     .setTitle('New event: ' + interaction.options.getString('name'))
                                     .setDescription('React to this message to indicate which day(s) you can go!')
                                     .setThumbnail(thumbnailUrl)
@@ -248,7 +248,7 @@ const eventCommand = {
                             else if (currentEventMsg) {
                                 // Edit original newEventEmbed
                                 const newEventEmbed = new Discord.MessageEmbed()
-                                    .setColor('#ff0cff')
+                                    .setColor('#42a3ef')
                                     .setTitle('New event: ' + interaction.options.getString('name'))
                                     .setDescription('React to this message to be given the associated role!')
                                     .setThumbnail(currentEventMsg.embeds[0].thumbnail.url)
@@ -287,7 +287,7 @@ const eventCommand = {
                             else if (currentEventMsg) {
                                 // Edit original newEventEmbed
                                 const newEventEmbed = new Discord.MessageEmbed()
-                                    .setColor('#ff0cff')
+                                    .setColor('#42a3ef')
                                     .setTitle('New event: ' + currentEvent.eventName)
                                     .setDescription('React to this message to be given the associated role!')
                                     .setThumbnail(currentEventMsg.embeds[0].thumbnail.url)
@@ -326,7 +326,7 @@ const eventCommand = {
                         else if (currentEventMsg) {
                             // Edit original newEventEmbed
                             const newEventEmbed = new Discord.MessageEmbed()
-                                .setColor('#ff0cff')
+                                .setColor('#42a3ef')
                                 .setTitle('[Canceled event]')
                                 .setDescription('This event was canceled :(')
                                 .setThumbnail(currentEventMsg.embeds[0].thumbnail.url)

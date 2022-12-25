@@ -29,14 +29,14 @@ const bugCommand = {
         // Create an embed for the bug report
         const embed = new Discord.MessageEmbed()
             .setColor('#42a3ef')
-            .setTitle('Rollup Bug Report')
+            .setTitle('Register Bug Report')
             .setDescription('**Details:**')
             .addFields(
                 { name: 'Reported by', value: interaction.user.tag, inline: false },
                 { name: 'Feature', value: interaction.options.getString('feature'), inline: false },
                 { name: 'Description', value: interaction.options.getString('description'), inline: false }
             )
-            .setThumbnail('https://raw.githubusercontent.com/edwardshturman/rollup-bot/master/assets/rollup-logo.png')
+            .setThumbnail('https://raw.githubusercontent.com/edwardshturman/register-bot/master/assets/register-logo-circle.png')
             .setTimestamp();
 
         // Send the embed to the bug reports channel in the dev server
