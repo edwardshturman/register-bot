@@ -16,6 +16,7 @@ Merry Christmas! 🎄
 
 ### Changed
 
+- `/event help` responds ephemerally (only the person that used it can see it) so as to avoid spam
 - A lot of boring stuff for code quality
 
 ### Removed
