@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Config command; starting with only `allowPurging`, **not `true` by default** as a safeguard, but may be added on to for future updates 👀
   - Usage: `/config <key> <value>`
 
+### Changed
+
+- Servers are now limited to 100 events
+
 ## 0.6.5 — 2022-12-25
 
 Merry Christmas! 🎄
