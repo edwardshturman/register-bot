@@ -109,6 +109,11 @@ const eventCommand = {
 
         // Execute /event add
         else if (interaction.options.getSubcommand() === 'add') {
+            // Check if the server has 100 or more events, and if so, don't allow any more
+            const eventCount = await Event.countDocuments({ guildId: interaction.guildId });
+            if (eventCount >= 100)
+                return await interaction.reply({ content: 'This server already has 100 or more events! Please purge some (`/event purge <age>`) before adding more.', ephemeral: true });
+
             const unsplashConnection = unsplash.createApi({
                 accessKey: process.env.UNSPLASH_ACCESS_KEY,
                 fetch: fetch
