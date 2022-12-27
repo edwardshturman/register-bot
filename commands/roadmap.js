@@ -24,7 +24,13 @@ const roadmapCommand = {
         }
 
         // Send the embeds
-        await interaction.reply({ embeds: embeds, ephemeral: true });
+        const reply = {};
+        if (embeds.length === 0)
+            reply.content = 'No Issues found in the repo! Feel free to submit one for a feature request or bug report.';
+        else
+            reply.embeds = embeds;
+        reply.ephemeral = true;
+        await interaction.reply(reply);
     }
 };
 
