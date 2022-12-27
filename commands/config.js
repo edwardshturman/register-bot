@@ -94,7 +94,7 @@ const configCommand = {
                     });
 
                 // Send configUpdatedEmbed
-                interaction.reply({ embeds: [configUpdatedEmbed], ephemeral: true });
+                interaction.reply({ embeds: [configUpdatedEmbed] });
             }
         }
     }
