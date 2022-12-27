@@ -31,7 +31,7 @@ for (const command of commands.default)
 // Log launch, set status
 client.once('ready', () => {
     console.log('Register is online!');
-    client.user.setActivity('/event | v0.6.5', { type: 'LISTENING' });
+    client.user.setActivity('/event | v0.7.0', { type: 'LISTENING' });
 });
 
 // Listens for new servers, might do something with this later
