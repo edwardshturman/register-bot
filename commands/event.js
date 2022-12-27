@@ -1,6 +1,7 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import Discord from 'discord.js';
 import Event from '../schemas/event-schema.js';
+import Config from '../schemas/config-schema.js';
 import fetch from 'node-fetch';
 import unsplash from 'unsplash-js';
 
@@ -76,6 +77,21 @@ const eventCommand = {
             .addStringOption(eventEmoji => eventEmoji
                 .setName('emoji')
                 .setDescription('The unique emoji for the event')
+                .setRequired(true)))
+
+        // Purge subcommand
+        .addSubcommand(purgeSubcommand => purgeSubcommand
+            .setName('purge')
+            .setDescription('Purge this server\'s events')
+            .addStringOption(age => age
+                .setName('age')
+                .setDescription('How old an event must be to be purged')
+                .setChoices(
+                    { name: 'Purge all events older than 1 week', value: '1 week' },
+                    { name: 'Purge all events older than 1 month', value: '1 month' },
+                    { name: 'Purge all events older than 3 months', value: '3 months' },
+                    { name: 'Purge all events older than 6 months', value: '6 months' },
+                    { name: 'Purge all events older than 1 year', value: '1 year' })
                 .setRequired(true))),
 
     async execute (interaction) {
@@ -93,6 +109,11 @@ const eventCommand = {
 
         // Execute /event add
         else if (interaction.options.getSubcommand() === 'add') {
+            // Check if the server has 100 or more events, and if so, don't allow any more
+            const eventCount = await Event.countDocuments({ guildId: interaction.guildId });
+            if (eventCount >= 100)
+                return await interaction.reply({ content: 'This server already has 100 or more events! Please purge some (`/event purge <age>`) before adding more.', ephemeral: true });
+
             const unsplashConnection = unsplash.createApi({
                 accessKey: process.env.UNSPLASH_ACCESS_KEY,
                 fetch: fetch
@@ -345,6 +366,56 @@ const eventCommand = {
                     await interaction.guild.roles.cache.get(currentEvent.eventRoleId).delete();
                 }
             });
+        }
+
+        // Execute /event purge
+        else if (interaction.options.getSubcommand() === 'purge') {
+            // Check server's config for if purging is allowed
+            const config = await Config.findOne({ guild: interaction.guildId });
+            if (!config)
+                return await interaction.reply({ content: 'This server hasn\'t set up a config yet! Ask an admin to run `/config set`.', ephemeral: true });
+
+            else if (config)
+                if (config.options.allowPurging !== 'true')
+                    return await interaction.reply({ content: 'This server doesn\'t allow purging events!', ephemeral: true });
+
+            const eventsCreatedByRegister = [];
+            const eventsToDelete = [];
+
+            // Determine age of events to delete
+            const eventAge = interaction.options.getString('age');
+            let eventAgeMs = 0;
+            if (eventAge === '1 week')
+                eventAgeMs = 604800000;
+            else if (eventAge === '1 month')
+                eventAgeMs = 2629746000;
+            else if (eventAge === '3 months')
+                eventAgeMs = 7889238000;
+            else if (eventAge === '6 months')
+                eventAgeMs = 15778476000;
+            else if (eventAge === '1 year')
+                eventAgeMs = 31556952000;
+
+            // Fetch all of the server's events and add to eventsCreatedByRegister
+            await Event.find({ guild: interaction.guildId }).then(async (events) => {
+                events.forEach((event) => {
+                    eventsCreatedByRegister.push(event.eventRoleId);
+                });
+            });
+
+            // Determine which events to delete based on when the role was created
+            await interaction.guild.roles.cache.forEach((role) => {
+                if (eventsCreatedByRegister.includes(role.id) && role.createdAt.getTime() < Date.now() - eventAgeMs)
+                    eventsToDelete.push(role.id);
+            });
+
+            // Delete event roles
+            for (let i = 0; i < eventsToDelete.length; i++)
+                await interaction.guild.roles.cache.get(eventsToDelete[i]).delete();
+
+            // Delete events from MongoDB
+            await Event.deleteMany({ guildId: interaction.guildId, eventRoleId: { $in: eventsToDelete } });
+            await interaction.reply('All events older than **' + eventAge + '** were deleted.');
         }
     }
 };

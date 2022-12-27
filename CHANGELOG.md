@@ -9,8 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Event purging to help with the limit (see below), or to just clean things up
+  - Usage: `/event purge <older than 1 week | 1 month | 3 months | 6 months | 1 year>`
 - Config command; starting with only `allowPurging`, **not `true` by default** as a safeguard, but may be added on to for future updates 👀
   - Usage: `/config <key> <value>`
+
+### Changed
+
+- Servers are now limited to 100 events
 
 ## 0.6.5 — 2022-12-25
 
