@@ -41,14 +41,14 @@ const configCommand = {
                             'Valid keys and values: `allowPurging` (`true` or `false`)\n',
                     inline: false
                 });
-            await interaction.reply({ embeds: [configHelpEmbed] });
+            await interaction.reply({ embeds: [configHelpEmbed], ephemeral: true });
 
         // Execute /config set
         } else if (interaction.options.getSubcommand() === 'set') {
             // Validate the key and value
             if (interaction.options.getString('key') === 'allowPurging')
                 if (interaction.options.getString('value') !== 'true' && interaction.options.getString('value') !== 'false')
-                    return await interaction.reply('Invalid value for `allowPurging`! Valid values are `true` and `false`.');
+                    return await interaction.reply({ content: 'Invalid value for `allowPurging`! Valid values are `true` and `false`.', ephemeral: true });
 
             let configFound = false;
             let existingOptions = {};
@@ -65,7 +65,7 @@ const configCommand = {
                             [interaction.options.getString('key')]: interaction.options.getString('value')
                         }
                     }).save();
-                    await interaction.reply('Created a new config for the server!');
+                    await interaction.reply({ content: 'Created a new config for the server, and set ' + interaction.options.getString('key') + ' to ' + interaction.options.getString('value') + '.', ephemeral: true });
                 }
             });
 
@@ -94,7 +94,7 @@ const configCommand = {
                     });
 
                 // Send configUpdatedEmbed
-                interaction.reply({ embeds: [configUpdatedEmbed] });
+                interaction.reply({ embeds: [configUpdatedEmbed], ephemeral: true });
             }
         }
     }
