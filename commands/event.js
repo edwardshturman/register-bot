@@ -397,7 +397,7 @@ const eventCommand = {
                 eventAgeMs = 31556952000;
 
             // Fetch all of the server's events and add to eventsCreatedByRegister
-            await Event.find({ guild: interaction.guildId }).then(async (events) => {
+            await Event.find({ guildId: interaction.guildId }).then(async (events) => {
                 events.forEach((event) => {
                     eventsCreatedByRegister.push(event.eventRoleId);
                 });
