@@ -65,7 +65,7 @@ const configCommand = {
                             [interaction.options.getString('key')]: interaction.options.getString('value')
                         }
                     }).save();
-                    await interaction.reply({ content: 'Created a new config for the server, and set ' + interaction.options.getString('key') + ' to ' + interaction.options.getString('value') + '.', ephemeral: true });
+                    await interaction.reply({ content: 'Created a new config for the server, and set `' + interaction.options.getString('key') + '` to `' + interaction.options.getString('value') + '`.', ephemeral: true });
                 }
             });
 
