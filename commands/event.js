@@ -371,7 +371,7 @@ const eventCommand = {
         // Execute /event purge
         else if (interaction.options.getSubcommand() === 'purge') {
             // Check server's config for if purging is allowed
-            const config = await Config.findOne({ guild: interaction.guildId });
+            const config = await Config.findOne({ guildId: interaction.guildId });
             if (!config)
                 return await interaction.reply({ content: 'This server hasn\'t set up a config yet! Ask an admin to run `/config set`.', ephemeral: true });
 
