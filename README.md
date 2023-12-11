@@ -2,7 +2,6 @@
 
 🌟 A high-quality, open-source Discord bot for event planning. 🗓
 
-[![Dependency status](https://david-dm.org/edwardshturman/register-bot.svg)](https://david-dm.org/edwardshturman/register-bot)
 [![GitHub last commit](https://img.shields.io/github/last-commit/edwardshturman/register-bot)](https://github.com/edwardshturman/register-bot/commits/master)
 
 ---
@@ -10,10 +9,6 @@
 ![Register logo](assets/register-logo-circle.png)
 
 ---
-
-## Invite Link
-
-→ [Add me](https://discord.com/api/oauth2/authorize?client_id=856081409742864384&permissions=2416168000&scope=bot%20applications.commands) to your server!
 
 ## Features
 
@@ -32,13 +27,7 @@ Use Register to:
 - Schedule a game night in your university's server
 - Offer career opportunities, talks, or conferences in your business' server
 
-## Demo
-
-*Coming soon!*
-
-## FAQ
-
-#### So how about privacy — what and where is all of this stored?
+## Privacy
 
 Register logs the following:
 
@@ -78,18 +67,10 @@ This is primarily a personal project for me and my friends, which I decided to s
 
 Feel free to look around, but please refrain from copying, modifying, or distributing Register source code without my explicit permission. Thank you!
 
-# 🚀 About Me
+## About Me
 
-👋 Hi there! I'm Edward, and I'm a Computer Science Major at the University of San Francisco. 💻
+I'm Edward, and I'm a design-engineer, Internet painter, and computer science major at the University of San Francisco.
 
-Register is a Discord bot I made for my group of friends — after our high school graduation in May 2021, we wanted to make the most of our Summer together, and we needed a tool to make planning trips, documenting availability, and tracking planning progress more convenient.
+Register is a Discord bot I made for my group of friends. After our high school graduation in May 2021, we wanted to make the most of our Summer together, and we needed a tool to make planning trips, documenting availability, and tracking planning progress more convenient.
 
-Well, here it is! I hope you enjoy, and I'll be updating it regularly for now. Go on and plan some epic events!
-
-## 🔗 See more of my work and say hello
-
-[![portfolio](https://img.shields.io/badge/portfolio-000?style=for-the-badge&logo=notion&logoColor=white)](https://about.edwardshturman.com/)
-
-[![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/edward-shturman)
-
-[![twitter](https://img.shields.io/badge/github-000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/edwardshturman)
+See more of my work and say hello over on [my website](https://edward.so).
